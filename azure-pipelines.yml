@@ -29,7 +29,10 @@ steps:
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
 
-      if az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
+      #to be removed
+      az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
+
+      if [ $? -eq 0 ]
       then
         echo "Git repository list:"
         jq .[].sshUrl /tmp/gitRepo.output > /tmp/gitRepo.list

@@ -29,8 +29,9 @@ steps:
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
 
-      az --version 
-      az account show 
+      #to be removed
+      az --version
+      az account show
       az config set extension.use_dynamic_install=yes_without_prompt
       az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
 

@@ -1,0 +1,40 @@
+name: nm-factory-inf-pip-operation
+
+pool:
+  name: Factory-VSS-Agents
+
+parameters:
+- name: issuer
+  displayName: Issuer Email
+  type: string
+
+- name: action
+  displayName: Action
+  type: string
+  default: create
+  values:
+  - create
+  #- renew WIP
+  #- revoke WIP
+
+steps:
+- task: AzureCLI@2
+  displayName: "Backup_gitRepos"
+  inputs:
+    azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      #!/bin/bash
+      ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
+      PROJECT=ecl-ado-prj-iac
+
+      if az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
+      then
+        echo "Git repository list:"
+        jq .[].sshUrl /tmp/gitRepo.output > /tmp/gitRepo.list
+        cat /tmp/gitRepo.list
+      else
+        echo "Error fetching the Git repository list"
+        exit 1
+      fi

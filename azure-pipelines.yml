@@ -30,6 +30,7 @@ steps:
       PROJECT=ecl-ado-prj-iac
 
       #to be removed
+      az extension add --name azure-devops
       az --version
       az account show
       az config set extension.use_dynamic_install=yes_without_prompt

@@ -3,17 +3,17 @@ name: nm-factory-inf-pip-operation
 pool:
   name: Factory-VSS-Agents
 
-parameters:
-- name: issuer
-  displayName: Issuer Email
-  type: string
+#parameters:
+#- name: issuer
+#  displayName: Issuer Email
+#  type: string
 
-- name: action
-  displayName: Action
-  type: string
-  default: create
-  values:
-  - create
+#- name: action
+#  displayName: Action
+#  type: string
+#  default: create
+#  values:
+#  - create
   #- renew WIP
   #- revoke WIP
 

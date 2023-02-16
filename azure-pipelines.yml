@@ -18,6 +18,7 @@ pool:
   #- revoke WIP
 
 steps:
+- checkout: git:ecl-ado-prj-iac/nm-factory-inf-env-azdevops
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:
@@ -29,20 +30,23 @@ steps:
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
 
+      echo "List downloaded repositories"
+      ls -lat 
+
       #to be removed
       az extension add --name azure-devops
       az --version
       az account show
       #az config set extension.use_dynamic_install=yes_without_prompt
       echo "Listing repositories ..."
-      az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
-      echo "Listing repositories ... done"
-      if [ $? -eq 0 ]
-      then
-        echo "Git repository list:"
-        jq .[].sshUrl /tmp/gitRepo.output > /tmp/gitRepo.list
-        cat /tmp/gitRepo.list
-      else
-        echo "Error fetching the Git repository list"
-        exit 1
-      fi
+      #az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
+      #echo "Listing repositories ... done"
+      #if [ $? -eq 0 ]
+      #then
+      #  echo "Git repository list:"
+      #  jq .[].sshUrl /tmp/gitRepo.output > /tmp/gitRepo.list
+      #  cat /tmp/gitRepo.list
+      #else
+      #  echo "Error fetching the Git repository list"
+      #  exit 1
+      #fi

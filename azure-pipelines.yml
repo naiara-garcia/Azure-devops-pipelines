@@ -36,7 +36,7 @@ steps:
       #az config set extension.use_dynamic_install=yes_without_prompt
       echo "Listing repositories ..."
       az repos list --org $ORGANIZATION --project $PROJECT > /tmp/gitRepo.output
-
+      echo "Listing repositories ... done"
       if [ $? -eq 0 ]
       then
         echo "Git repository list:"

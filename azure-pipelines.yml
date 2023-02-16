@@ -16,20 +16,20 @@ pool:
 #  - create
   #- renew WIP
   #- revoke WIP
-resources:
-  repositories:
-  - repository: nm-factory-inf-pip-operations
-    type: github
-    endpoint: ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs
-    name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
+#resources:
+#  repositories:
+#  - repository: nm-factory-inf-pip-operations
+#    type: github
+#    endpoint: ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs
+#    name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
 
 
 steps:
-- checkout: nm-factory-inf-pip-operations
+#- checkout: nm-factory-inf-pip-operations
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:
-    azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+    azureSubscription: 'ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |

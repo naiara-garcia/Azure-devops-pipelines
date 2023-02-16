@@ -20,7 +20,7 @@ resources:
   repositories:
   - repository: nm-factory-inf-pip-operations
     type: github
-    endpoint: ecl-az-fact-svc-01-armconnection
+    endpoint: ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs
     name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
 
 

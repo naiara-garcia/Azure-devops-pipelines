@@ -21,7 +21,7 @@ steps:
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:
-    azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+    azureSubscription: 'ecl-az-fact-svc-01-adrconnection'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |

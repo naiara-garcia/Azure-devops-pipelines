@@ -25,7 +25,7 @@ pool:
 
 
 steps:
-#- checkout: nm-factory-inf-pip-operations
+- checkout: git//ecl-ado-prj-iac/nm-factory-inf-pip-certs
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:

@@ -16,7 +16,8 @@ pool:
 #  - create
   #- renew WIP
   #- revoke WIP
-
+variables:
+   SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 steps:
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
@@ -31,7 +32,7 @@ steps:
       PROJECT=ecl-ado-prj-iac
 
       echo "List downloaded repositories"
-      ls -lat 
+      ls -lat
 
       #to be removed
       az extension add --name azure-devops
@@ -39,7 +40,7 @@ steps:
       az account show
       #az config set extension.use_dynamic_install=yes_without_prompt
       echo "Listing repositories ..."
-      az repos list --org $ORGANIZATION --project $PROJECT --debug
+      #az repos list --org $ORGANIZATION --project $PROJECT --debug
       #echo "Listing repositories ... done"
       #if [ $? -eq 0 ]
       #then
@@ -50,3 +51,7 @@ steps:
       #  echo "Error fetching the Git repository list"
       #  exit 1
       #fi
+
+- script: "echo $SYSTEM_ACCESSTOKEN"
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)

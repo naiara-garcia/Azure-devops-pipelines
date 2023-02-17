@@ -16,23 +16,8 @@ pool:
 #  - create
   #- renew WIP
   #- revoke WIP
-#resources:
-#  repositories:
-#  - repository: nm-factory-inf-pip-operations
-#    type: github
-#    endpoint: ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs
-#    name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
-
-resources:
-  repositories:
-  - repository: nm-factory-inf-pip-certs
-    type: github
-    endpoint: ecl-az-fact-svc-01-adrconnection
-    name: ecl-ado-factory/nm-factory-inf-pip-certs
 
 steps:
-- checkout: nm-factory-inf-pip-certs
-#- checkout: git//ecl-ado-prj-iac/nm-factory-inf-pip-certs
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:

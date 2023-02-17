@@ -52,6 +52,6 @@ steps:
       #  exit 1
       #fi
 
-- script: "echo $SYSTEM_ACCESSTOKEN"
+- script: "'git -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" clone --depth 1 https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-dpl-env-testing'"
   env:
     SYSTEM_ACCESSTOKEN: $(System.AccessToken)

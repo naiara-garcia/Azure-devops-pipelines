@@ -53,6 +53,6 @@ steps:
       #fi
 
 - script: |
-    git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-dpl-env-testing
+    git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-pip-operations
   env:
     SYSTEM_ACCESSTOKEN: $(System.AccessToken)

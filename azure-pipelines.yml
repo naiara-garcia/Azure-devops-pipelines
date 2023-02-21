@@ -20,7 +20,7 @@ variables:
    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
 resources:
-  -template: resource-template.yml
+- template: resource-template.yml
 
 
   steps:

@@ -67,7 +67,7 @@ steps:
       #fi
 
 - script: |
-    ls -lat ./repositories/
+    ls -lat
     #git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-pip-operations
     #ls -lat
     #git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev

@@ -34,8 +34,8 @@ steps:
 - checkout: nm-factory-inf-env-pro
 
 - script: |
-    LOCAL_FOLDER_NAME=`date  +%Y%m%d%H%M%S`
-    BACKUP_FILE=azureGitRepos-${LOCAL_FOLDER_NAME}.tgz
+    LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
+    BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"
     REPO_PREFIX="./nm-factory-*""
     echo "##vso[task.setvariable variable=BACKUP_FILE]${BACKUP_FILE}"
     ls -lat

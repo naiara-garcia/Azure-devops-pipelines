@@ -19,8 +19,8 @@ pool:
 variables:
    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
-extends:
-  template: resource-template.yml
+resources:
+  -template: resource-template.yml
 
 
   steps:

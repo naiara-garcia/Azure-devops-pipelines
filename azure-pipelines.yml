@@ -65,9 +65,9 @@ steps:
       az --version
       az account show
       az storage blob list \
-        --account-name $ACCOUNT_NAME \
-        --account-key $ACCOUNT_KEY \
-        --container-name CONTAINER_NAME \
+        --account-name ${ACCOUNT_NAME} \
+        --account-key ${ACCOUNT_KEY} \
+        --container-name ${CONTAINER_NAME} 
 
 
       #az config set extension.use_dynamic_install=yes_without_prompt

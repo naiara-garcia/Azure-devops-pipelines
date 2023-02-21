@@ -35,10 +35,12 @@ steps:
 
 - script: |
     REPO_FOLDER_NAME=`date  +%F_%Hh%Mm%Ss`
+    echo "##vso[task.setvariable variable=REPO_FOLDER_NAME]${REPO_FOLDER_NAME}"
     ls -lat
-    mkdir ./$REPO_FOLDER_NAME
-    mv ./nm-factory-* ./$REPO_FOLDER_NAME
-    tar -cvzf $REPO_FOLDER_NAME.tgz ./$REPO_FOLDER_NAME
+    mkdir ./${REPO_FOLDER_NAME}
+    mv ./nm-factory-* ./${REPO_FOLDER_NAME}
+    tar -cvzf ${REPO_FOLDER_NAME}.tgz ./${REPO_FOLDER_NAME}
+
 
 - task: AzureCLI@2
   displayName: "Upload backups"
@@ -49,6 +51,7 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       #!/bin/bash
+      echo "REPO_FOLDER_NAME = ${REPO_FOLDER_NAME}"
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
 

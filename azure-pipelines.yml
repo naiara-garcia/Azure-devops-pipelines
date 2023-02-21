@@ -19,6 +19,7 @@ pool:
 variables:
    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 steps:
+- checkout: git//ecl-ado-prj-iac/nm-factory-inf-env-dev
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:

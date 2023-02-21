@@ -46,14 +46,13 @@ steps:
 - task: AzureCLI@2
   displayName: "Upload backups"
   inputs:
-#   azureSubscription: 'ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs'
     azureSubscription: 'ecl-az-fact-svc-01-armconnection'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
       #!/bin/bash
       echo "BACKUP_FILE = ${BACKUP_FILE}"
-      CONTAINER_FOLDER = azureGitRepos
+      CONTAINER_FOLDER="azureGitRepos"
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
 
@@ -62,31 +61,16 @@ steps:
       ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
       az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
       
-      echo "List downloaded repositories"
+      echo "List local backup:"
       ls -lat
 
-      #to be removed
-      #az extension add --name azure-devops
-      #az --version
-      #az account show
+      echo "Current Azure account:"
+      az account show
+      echo "Upload backup file"
       az storage blob upload \
         --account-name ${ACCOUNT_NAME} \
         --account-key ${ACCOUNT_KEY} \
         --container-name ${CONTAINER_NAME} \
         --file ${BACKUP_FILE} \
         --name ${CONTAINER_FOLDER}/${BACKUP_FILE}
-
-
-      #az config set extension.use_dynamic_install=yes_without_prompt
-      #az repos list --org $ORGANIZATION --project $PROJECT --debug
-      #echo "Listing repositories ... done"
-      #if [ $? -eq 0 ]
-      #then
-      #  echo "Git repository list:"
-      #  jq .[].sshUrl /tmp/gitRepo.output > /tmp/gitRepo.list
-      #  cat /tmp/gitRepo.list
-      #else
-      #  echo "Error fetching the Git repository list"
-      #  exit 1
-      #fi
 

@@ -18,7 +18,7 @@ pool:
   #- revoke WIP
 
 
-extend:
+extends:
   template: resource-template.yml
 
 

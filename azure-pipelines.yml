@@ -34,12 +34,13 @@ steps:
 - checkout: nm-factory-inf-env-pro
 
 - script: |
-    LOCAL_FOLDER_NAME=`date  +%F_%Hh%Mm%Ss`
-    BACKUP_FILE=${LOCAL_FOLDER_NAME}.tgz
+    LOCAL_FOLDER_NAME=`date  +%Y%m%d%H%M%S`
+    BACKUP_FILE=azureGitRepos-${LOCAL_FOLDER_NAME}.tgz
+    REPO_PREFIX="./nm-factory-*""
     echo "##vso[task.setvariable variable=BACKUP_FILE]${BACKUP_FILE}"
     ls -lat
     mkdir ./${LOCAL_FOLDER_NAME}
-    mv ./nm-factory-* ./${LOCAL_FOLDER_NAME}
+    mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
     tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
 
 
@@ -52,7 +53,7 @@ steps:
     inlineScript: |
       #!/bin/bash
       echo "BACKUP_FILE = ${BACKUP_FILE}"
-      CONTAINER_FOLDER="azureGitRepos"
+      CONTAINER_FOLDER="azureGitRepos/backups"
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
 

@@ -51,6 +51,8 @@ steps:
       #!/bin/bash
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
+
+      ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
       ACCOUNT_NAME=eclazfactsta01assets
       CONTAINER_NAME=ecl-az-fact-stc-01-backups
 
@@ -61,7 +63,11 @@ steps:
       az extension add --name azure-devops
       az --version
       az account show
-      az storage blob list --account-name $ACCOUNT_NAME --container-name CONTAINER_NAME
+      az storage blob list \
+        --account-name $ACCOUNT_NAME \
+        --account-key $ACCOUNT_KEY \
+        --container-name CONTAINER_NAME \
+
 
       #az config set extension.use_dynamic_install=yes_without_prompt
       #az repos list --org $ORGANIZATION --project $PROJECT --debug

@@ -22,7 +22,7 @@ resources:
   repositories:
   - repository: nm-factory-inf-env-dev
     type: git
-    name: ecl-ado-factory/nm-factory-inf-env-dev
+    name: ecl-ado-prj-iac/nm-factory-inf-env-dev
 
 steps:
 - checkout: nm-factory-inf-env-dev

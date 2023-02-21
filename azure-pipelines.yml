@@ -21,50 +21,51 @@ pool:
 extends:
   template: resource-template.yml
 
+jobs:
+- job:
+  steps:
+  - checkout: nm-factory-inf-env-dev
+  - checkout: nm-factory-inf-env-pro
 
-steps:
-- checkout: nm-factory-inf-env-dev
-- checkout: nm-factory-inf-env-pro
-
-- script: |
-    LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
-    BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"
-    REPO_PREFIX="./nm-factory-*"
-    echo "##vso[task.setvariable variable=BACKUP_FILE]${BACKUP_FILE}"
-    ls -lat
-    mkdir ./${LOCAL_FOLDER_NAME}
-    mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
-    tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
-
-
-- task: AzureCLI@2
-  displayName: "Upload backups"
-  inputs:
-    azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      #!/bin/bash
-      echo "BACKUP_FILE = ${BACKUP_FILE}"
-      CONTAINER_FOLDER="azureGitRepos/backups"
-      ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
-      PROJECT=ecl-ado-prj-iac
-
-      ACCOUNT_NAME=eclazfactsta01assets
-      CONTAINER_NAME=ecl-az-fact-stc-01-backups
-      ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
-      az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
-      
-      echo "List local backup:"
+  - script: |
+      LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
+      BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"
+      REPO_PREFIX="./nm-factory-*"
+      echo "##vso[task.setvariable variable=BACKUP_FILE]${BACKUP_FILE}"
       ls -lat
+      mkdir ./${LOCAL_FOLDER_NAME}
+      mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
+      tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
 
-      echo "Current Azure account:"
-      az account show
-      echo "Upload backup file"
-      az storage blob upload \
-        --account-name ${ACCOUNT_NAME} \
-        --account-key ${ACCOUNT_KEY} \
-        --container-name ${CONTAINER_NAME} \
-        --file ${BACKUP_FILE} \
-        --name ${CONTAINER_FOLDER}/${BACKUP_FILE}
+
+  - task: AzureCLI@2
+    displayName: "Upload backups"
+    inputs:
+      azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        #!/bin/bash
+        echo "BACKUP_FILE = ${BACKUP_FILE}"
+        CONTAINER_FOLDER="azureGitRepos/backups"
+        ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
+        PROJECT=ecl-ado-prj-iac
+
+        ACCOUNT_NAME=eclazfactsta01assets
+        CONTAINER_NAME=ecl-az-fact-stc-01-backups
+        ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
+        az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
+      
+        echo "List local backup:"
+        ls -lat
+
+        echo "Current Azure account:"
+        az account show
+        echo "Upload backup file"
+        az storage blob upload \
+          --account-name ${ACCOUNT_NAME} \
+          --account-key ${ACCOUNT_KEY} \
+          --container-name ${CONTAINER_NAME} \
+          --file ${BACKUP_FILE} \
+          --name ${CONTAINER_FOLDER}/${BACKUP_FILE}
 

@@ -33,8 +33,15 @@ steps:
 - checkout: nm-factory-inf-env-dev
 - checkout: nm-factory-inf-env-pro
 
+- script: |
+    REPO_FOLDER_NAME=`date  +%F_%Hh%Mm%Ss`
+    ls -lat
+    mkdir ./$REPO_FOLDER_NAME
+    mv ./nm-factory-* ./$REPO_FOLDER_NAME
+    tar -cvzf $REPO_FOLDER_NAME.tgz ./$REPO_FOLDER_NAME
+
 - task: AzureCLI@2
-  displayName: "Backup_gitRepos"
+  displayName: "Upload backups"
   inputs:
 #   azureSubscription: 'ecl-az-fact-svc-01-armconnection-azure-euroctl-hub-subs'
     azureSubscription: 'ecl-az-fact-svc-01-armconnection'
@@ -44,6 +51,8 @@ steps:
       #!/bin/bash
       ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
       PROJECT=ecl-ado-prj-iac
+      ACCOUNT_NAME=eclazfactsta01assets
+      CONTAINER_NAME=ecl-az-fact-stc-01-backups
 
       echo "List downloaded repositories"
       ls -lat
@@ -52,8 +61,9 @@ steps:
       az extension add --name azure-devops
       az --version
       az account show
+      az storage blob list --account-name $ACCOUNT_NAME --container-name CONTAINER_NAME
+
       #az config set extension.use_dynamic_install=yes_without_prompt
-      echo "Listing repositories ..."
       #az repos list --org $ORGANIZATION --project $PROJECT --debug
       #echo "Listing repositories ... done"
       #if [ $? -eq 0 ]
@@ -66,11 +76,3 @@ steps:
       #  exit 1
       #fi
 
-- script: |
-    ls -lat
-    #git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-pip-operations
-    #ls -lat
-    #git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
-    #ls -lat
-  #env:
-  #  SYSTEM_ACCESSTOKEN: $(System.AccessToken)

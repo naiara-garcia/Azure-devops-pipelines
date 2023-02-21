@@ -18,8 +18,15 @@ pool:
   #- revoke WIP
 variables:
    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+resources:
+  repositories:
+  - repository: nm-factory-inf-env-dev
+    type: git
+    name: ecl-ado-factory/nm-factory-inf-env-dev
+
 steps:
-- checkout: git//ecl-ado-prj-iac/nm-factory-inf-env-dev
+- checkout: nm-factory-inf-env-dev
+
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
   inputs:

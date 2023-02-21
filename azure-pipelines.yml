@@ -23,9 +23,15 @@ resources:
   - repository: nm-factory-inf-env-dev
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-dev
+    path: ./repositories/
+  - repository: nm-factory-inf-env-pro
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+    path: ./repositories/
 
 steps:
 - checkout: nm-factory-inf-env-dev
+- checkout: nm-factory-inf-env-pro
 
 - task: AzureCLI@2
   displayName: "Backup_gitRepos"
@@ -61,10 +67,10 @@ steps:
       #fi
 
 - script: |
-    ls -lat
-    git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-pip-operations
-    ls -lat
-    git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
-    ls -lat
-  env:
-    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    ls -lat ./repositories/
+    #git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-pip-operations
+    #ls -lat
+    #git clone --mirror -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
+    #ls -lat
+  #env:
+  #  SYSTEM_ACCESSTOKEN: $(System.AccessToken)

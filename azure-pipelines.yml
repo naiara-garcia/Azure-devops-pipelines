@@ -55,7 +55,8 @@ steps:
       ACCOUNT_NAME=eclazfactsta01assets
       CONTAINER_NAME=ecl-az-fact-stc-01-backups
       ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
-
+      az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
+      
       echo "List downloaded repositories"
       ls -lat
 

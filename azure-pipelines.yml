@@ -3,6 +3,10 @@ name: nm-factory-inf-pip-operation
 pool:
   name: Factory-VSS-Agents
 
+- cron: "*/5 * * * *"
+  displayName: Nightly backup
+  always: true
+
 #parameters:
 #- name: issuer
 #  displayName: Issuer Email

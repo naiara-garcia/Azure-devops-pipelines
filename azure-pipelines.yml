@@ -6,6 +6,9 @@ pool:
 schedules:
 - cron: "*/5 * * * *"
   displayName: Nightly backup
+  branches:
+    include:
+    - main
   always: true
 
 #parameters:

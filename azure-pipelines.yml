@@ -3,6 +3,7 @@ name: nm-factory-inf-pip-operation
 pool:
   name: Factory-VSS-Agents
 
+schedule
 - cron: "*/5 * * * *"
   displayName: Nightly backup
   always: true

@@ -4,7 +4,7 @@ pool:
   name: Factory-VSS-Agents
 
 schedules:
-- cron: "*/5 * * * *"
+- cron: "00 2 * * *"
   displayName: Nightly backup
   branches:
     include:

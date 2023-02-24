@@ -99,6 +99,8 @@ jobs:
           --container-name ${CONTAINER_NAME} \
           --file ${BACKUP_FILE} \
           --name ${CONTAINER_FOLDER}/${BACKUP_FILE}
+
+
   - task: AzureCLI@2
     displayName: "Backup retention"
     inputs:
@@ -108,6 +110,7 @@ jobs:
       inlineScript: |
 
         thresholdDate=`date -d "${RETENTION}" +%Y%m%d%H%M%S`
+        echo $thresholdDate
 
         az storage blob list --account-name ${ACCOUNT_NAME} --account-key ${ACCOUNT_KEY} --container-name ${CONTAINER_NAME} --prefix ${CONTAINER_FOLDER}/ | jq .[].name | tr -d "\"" > /tmp/backups.list
 

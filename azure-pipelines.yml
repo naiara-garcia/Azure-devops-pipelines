@@ -43,6 +43,8 @@ jobs:
   variables:
   - name: BACKUP_FILE
     value: ""
+  - name: ACCOUNT_KEY
+    value: ""
   - name: CONTAINER_FOLDER
     value: "azureGitRepos/backups"
     readonly: true

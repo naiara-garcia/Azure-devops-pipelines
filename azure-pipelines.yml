@@ -43,8 +43,6 @@ jobs:
   variables:
   - name: BACKUP_FILE
     value: ""
-  - name: ACCOUNT_KEY
-    value: ""
   - name: CONTAINER_FOLDER
     value: "azureGitRepos/backups"
     readonly: true
@@ -110,7 +108,7 @@ jobs:
       inlineScript: |
 
         thresholdDate=`date -d "${RETENTION}" +%Y%m%d%H%M%S`
-        echo "ACCOUNT_KEY = ${ACCOUNT_KEY}"
+        ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
 
         az storage blob list --account-name ${ACCOUNT_NAME} --account-key ${ACCOUNT_KEY} --container-name ${CONTAINER_NAME} --prefix ${CONTAINER_FOLDER}/ | jq .[].name | tr -d "\"" > /tmp/backups.list
 

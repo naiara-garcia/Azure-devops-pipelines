@@ -41,9 +41,26 @@ resources:
 jobs:
 - job:
   variables:
+    readonly: true
+  - name: BACKUP_FILE
+    value: ""
+  - name: CONTAINER_FOLDER
+    value: "azureGitRepos/backups"
+    readonly: true
+  - name: ORGANIZATION
+    value: "https://dev.azure.com/ecl-ado-factory/"
+    readonly: true
+  - name: ACCOUNT_NAME
+    value: "eclazfactsta01assets"
+    readonly: true
+  - name: CONTAINER_NAME
+    value: "ecl-az-fact-stc-01-backups"
+    readonly: true
   - name: RETENTION
     value: "-14 hours" #"-1 days" or "-1 weeks" or "-1 month"
-    readonly: true
+
+
+
   steps:
   - checkout: nm-factory-inf-env-dev
   - checkout: nm-factory-inf-env-pro
@@ -67,12 +84,7 @@ jobs:
       inlineScript: |
         #!/bin/bash
         echo "BACKUP_FILE = ${BACKUP_FILE}"
-        CONTAINER_FOLDER="azureGitRepos/backups"
-        ORGANIZATION=https://dev.azure.com/ecl-ado-factory/
-        PROJECT=ecl-ado-prj-iac
 
-        ACCOUNT_NAME=eclazfactsta01assets
-        CONTAINER_NAME=ecl-az-fact-stc-01-backups
         ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
         az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
       
@@ -92,8 +104,6 @@ jobs:
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
-
-        RETENTION="-14 hours" #"-1 days" or "-1 weeks" or "-1 month"
 
         thresholdDate=`date -d "${RETENTION}" +%Y%m%d%H%M%S`
 

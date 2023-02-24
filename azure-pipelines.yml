@@ -110,7 +110,7 @@ jobs:
       inlineScript: |
 
         thresholdDate=`date -d "${RETENTION}" +%Y%m%d%H%M%S`
-        echo $thresholdDate
+        echo "ACCOUNT_KEY = ${ACCOUNT_KEY}"
 
         az storage blob list --account-name ${ACCOUNT_NAME} --account-key ${ACCOUNT_KEY} --container-name ${CONTAINER_NAME} --prefix ${CONTAINER_FOLDER}/ | jq .[].name | tr -d "\"" > /tmp/backups.list
 

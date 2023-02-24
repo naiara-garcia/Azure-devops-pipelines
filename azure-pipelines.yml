@@ -41,7 +41,9 @@ resources:
 jobs:
 - job:
   variables:
-  - retention: "-14 hours" #"-1 days" or "-1 weeks" or "-1 month"
+  - name: RETENTION
+    value: "-14 hours" #"-1 days" or "-1 weeks" or "-1 month"
+    readonly: true
   steps:
   - checkout: nm-factory-inf-env-dev
   - checkout: nm-factory-inf-env-pro

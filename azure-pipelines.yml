@@ -41,7 +41,6 @@ resources:
 jobs:
 - job:
   variables:
-    readonly: true
   - name: BACKUP_FILE
     value: ""
   - name: CONTAINER_FOLDER
@@ -58,6 +57,7 @@ jobs:
     readonly: true
   - name: RETENTION
     value: "-14 hours" #"-1 days" or "-1 weeks" or "-1 month"
+    readonly: true
 
 
 

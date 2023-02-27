@@ -1,6 +1,6 @@
 resources:
   repositories:
-   - repository: nm-factory-k8s-env-helm
+  - repository: nm-factory-k8s-env-helm
     type: git
     name: ecl-ado-prj-iac/nm-factory-k8s-env-helm
   - repository: nm-factory-k8s-env-helmdev

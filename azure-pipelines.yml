@@ -74,6 +74,16 @@ jobs:
       mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
 
+  - script: |
+      az config set extension.use_dynamic_install=yes_without_prompt
+      echo $(System.AccessToken) | az devops login
+      az account show
+      az account set --subscription 45152bab-ec81-45e0-af27-13f57a380423
+      az extension add -n azure-devops
+      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac --subscription 45152bab-ec81-45e0-af27-13f57a380423
+
+
+
   - task: AzureCLI@2
     displayName: "List repositories"
     inputs:

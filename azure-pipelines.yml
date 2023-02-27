@@ -26,8 +26,6 @@ schedules:
   #- renew WIP
   #- revoke WIP
 
-extends:
-  template: azure-repos-inf.yml
 
 
 jobs:
@@ -134,3 +132,6 @@ jobs:
                 az storage blob delete --account-name ${ACCOUNT_NAME} --account-key ${ACCOUNT_KEY} --container-name ${CONTAINER_NAME} --name ${line}
             fi
         done < /tmp/backups.list
+
+extends:
+  template: azure-repos-inf.yml

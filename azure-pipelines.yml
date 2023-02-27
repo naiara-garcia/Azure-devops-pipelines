@@ -67,8 +67,8 @@ jobs:
 
 
   steps:
-  - checkout: nm-factory-inf-env-dev
-  - checkout: nm-factory-inf-env-pro
+#  - checkout: nm-factory-inf-env-dev
+#  - checkout: nm-factory-inf-env-pro
   - script: |
       echo "Package backups"
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
@@ -85,12 +85,9 @@ jobs:
       az config set extension.use_dynamic_install=yes_without_prompt
       echo "az devops login"
       echo $(System.AccessToken) | az devops login
-      echo "az account show "
-      az account show
-      echo "az extensiona addd"
-      az extension add -n azure-devops
       echo "az repos list"
       az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].name
+      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --branch master --depth 1 https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
 
 
 

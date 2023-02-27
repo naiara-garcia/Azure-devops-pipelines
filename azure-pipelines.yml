@@ -1,18 +1,4 @@
-trigger: none
 
-name: nm-factory-inf-pip-operation
-
-pool:
-  name: Factory-VSS-Agents
-
-schedules:
-- cron: "0 2 * * *"
-  displayName: Nightly backup
-  branches:
-    include:
-    - main
-    - initial
-  always: true
 
 #parameters:
 #- name: issuer
@@ -28,8 +14,6 @@ schedules:
   #- renew WIP
   #- revoke WIP
 
-resources:
-- template: 'azure-repos-inf.yml'
 
 jobs:
 - job:

@@ -1,12 +1,7 @@
 name: nm-factory-inf-pip-operation
 
 parameters: 
-- name: repositories
-  type: string
-  default: default
-  values:
-  - nm-factory-inf-env-dev
-  - nm-factory-inf-env-pro
+- repositories: ["nm-factory-inf-env-dev", "nm-factory-inf-env-pro"]
 
 pool:
   name: Factory-VSS-Agents

@@ -26,7 +26,8 @@ schedules:
   #- renew WIP
   #- revoke WIP
 
-
+extends:
+  template: 'azure-repos-inf.yml'
 
 jobs:
 - job:
@@ -133,5 +134,3 @@ jobs:
             fi
         done < /tmp/backups.list
 
-extends:
-  template: azure-repos-inf.yml

@@ -70,6 +70,22 @@ jobs:
 #  - checkout: nm-factory-inf-env-dev
 #  - checkout: nm-factory-inf-env-pro
   - script: |
+      echo "Clone repositories configured as resources"
+      echo "az config"
+      az config set extension.use_dynamic_install=yes_without_prompt
+      echo "az devops login"
+      echo $(System.AccessToken) | az devops login
+      echo "az repos list"
+      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl > /tmp/repoUrls.list
+
+      while read repoUrl; 
+      do 
+        git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
+      done < /tmp/repoUrls.list
+      ls -lat
+
+
+  - script: |
       echo "Package backups"
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"
@@ -79,15 +95,6 @@ jobs:
       mkdir ./${LOCAL_FOLDER_NAME}
       mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
-
-  - script: |
-      echo "az config"
-      az config set extension.use_dynamic_install=yes_without_prompt
-      echo "az devops login"
-      echo $(System.AccessToken) | az devops login
-      echo "az repos list"
-      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].name
-      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
 
 
   - task: AzureCLI@2

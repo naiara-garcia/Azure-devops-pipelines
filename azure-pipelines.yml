@@ -26,8 +26,8 @@ schedules:
   #- renew WIP
   #- revoke WIP
 
-extends:
-  template: 'azure-repos-inf.yml'
+resources:
+- template: 'azure-repos-inf.yml'
 
 jobs:
 - job:

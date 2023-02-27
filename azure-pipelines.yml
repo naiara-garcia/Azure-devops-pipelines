@@ -70,6 +70,7 @@ jobs:
   - checkout: nm-factory-inf-env-dev
   - checkout: nm-factory-inf-env-pro
   - script: |
+      echo "Package backups"
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"
       REPO_PREFIX="./nm-factory-*"
@@ -80,11 +81,17 @@ jobs:
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
 
   - script: |
+      echo "az config"
       az config set extension.use_dynamic_install=yes_without_prompt
+      echo "az devops login"
       echo $(System.AccessToken) | az devops login
+      echo "az account show "
       az account show
+      echo "az extensiona addd"
       az extension add -n azure-devops
+      echo "az repos list"
       az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].name
+
 
 
   - task: AzureCLI@2

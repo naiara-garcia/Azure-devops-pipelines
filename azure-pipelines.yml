@@ -62,8 +62,11 @@ jobs:
 
 
   steps:
-  - checkout: nm-factory-inf-env-dev
-  - checkout: nm-factory-inf-env-pro
+  - ${{ each repo in resources.repositories }}:
+    - script: |
+        echo ${{repo}}
+  #- checkout: nm-factory-inf-env-dev
+  #- checkout: nm-factory-inf-env-pro
   - script: |
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"

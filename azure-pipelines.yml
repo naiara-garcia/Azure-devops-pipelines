@@ -80,6 +80,7 @@ jobs:
 
       while read repoUrl; 
       do 
+        echo "Cloning $repoUrl"
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
       done < /tmp/repoUrls.list
       ls -lat

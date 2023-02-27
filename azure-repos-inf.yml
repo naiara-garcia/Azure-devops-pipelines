@@ -1,3 +1,17 @@
+name: nm-factory-inf-pip-operation-backup-repos-inf
+
+pool:
+  name: Factory-VSS-Agents
+
+schedules:
+- cron: "0 2 * * *"
+  displayName: Nightly backup
+  branches:
+    include:
+    - main
+    - initial
+  always: true
+
 resources:
   repositories:
   - repository: nm-factory-inf-env-ansible
@@ -66,3 +80,6 @@ resources:
   - repository: nm-factory-inf-pip-terraform
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform
+
+jobs:
+- template: azure-pipelines.yml

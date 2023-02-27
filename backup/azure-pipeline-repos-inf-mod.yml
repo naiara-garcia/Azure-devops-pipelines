@@ -56,9 +56,7 @@ resources:
   - repository: nm-factory-inf-mod-vpn
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-mod-vpn
-  - repository: nm-factory-inf-pip-certs
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-pip-certs
+
 
 jobs:
 - template: azure-pipelines.yml

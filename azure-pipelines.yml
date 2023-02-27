@@ -83,9 +83,9 @@ jobs:
       #  echo "Cloning $repoUrl"
       #  git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
       #done < /tmp/repoUrls.list
-      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev nm-factory-inf-env-dev
+      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror "https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev"
       ls -lat 
-      ls -lat ./nm-factory-inf-env-dev
+
 
 
   - script: |

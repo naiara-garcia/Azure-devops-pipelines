@@ -62,9 +62,9 @@ jobs:
 
 
   steps:
-  - ${{ each repo in resources.repositories }}:
+  - ${{ each repository in resources.repositories }}:
     - script: |
-        echo ${{repo}}
+        echo ${{repository}}
   #- checkout: nm-factory-inf-env-dev
   #- checkout: nm-factory-inf-env-pro
   - script: |

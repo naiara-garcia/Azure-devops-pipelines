@@ -62,11 +62,8 @@ jobs:
 
 
   steps:
-  - ${{ each repository in resources.repositories }}:
-    - script: |
-        echo ${{repository}}
-  #- checkout: nm-factory-inf-env-dev
-  #- checkout: nm-factory-inf-env-pro
+  - checkout: nm-factory-inf-env-dev
+  - checkout: nm-factory-inf-env-pro
   - script: |
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${LOCAL_FOLDER_NAME}.tgz"
@@ -76,6 +73,23 @@ jobs:
       mkdir ./${LOCAL_FOLDER_NAME}
       mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
+
+  - task: AzureCLI@2
+    displayName: "List repositories"
+    inputs:
+      azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        #!/bin/bash
+
+        ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
+        echo "##vso[task.setvariable variable=ACCOUNT_KEY]${ACCOUNT_KEY}"
+      
+        echo "Current Azure account:"
+        az account show
+
+        az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac
 
 
   - task: AzureCLI@2

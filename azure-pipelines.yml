@@ -29,18 +29,87 @@ schedules:
 
 resources:
   repositories:
+  - repository: nm-factory-inf-env-ansible
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-env-ansible
+  - repository: nm-factory-inf-env-azdevops
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-env-azdevops
   - repository: nm-factory-inf-env-dev
     type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-env-dev
-    path: repositories
+    ecl-ado-prj-iac/nm-factory-inf-env-dev
   - repository: nm-factory-inf-env-pro
     type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
-    path: repositories
+    ecl-ado-prj-iac/nm-factory-inf-env-pro
+  - repository: nm-factory-inf-env-seed
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-env-seed
+  - repository: nm-factory-inf-mod-aks
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-aks
+  - repository: nm-factory-inf-mod-azdevops
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-azdevops
+  - repository: nm-factory-inf-mod-bastion
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-bastion
+  - repository: nm-factory-inf-mod-certs
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-certs
+  - repository: nm-factory-inf-mod-dns
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-dns
+  - repository: nm-factory-inf-mod-fwpolicies
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-fwpolicies
+  - repository: nm-factory-inf-mod-keyvault
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-keyvault
+  - repository: nm-factory-inf-mod-naming
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-naming
+  - repository: nm-factory-inf-mod-network
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-network
+  - repository: nm-factory-inf-mod-nsgs
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-nsgs
+  - repository: nm-factory-inf-mod-postgresql
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-postgresql
+  - repository: nm-factory-inf-mod-routes
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-routes
   - repository: nm-factory-inf-mod-vm
     type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-mod-vm
-    path: repositories
+    ecl-ado-prj-iac/nm-factory-inf-mod-vm
+  - repository: nm-factory-inf-mod-vpn
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-mod-vpn
+  - repository: nm-factory-inf-pip-certs
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-pip-certs
+  - repository: nm-factory-inf-pip-operations
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-pip-operations
+  - repository: nm-factory-inf-pip-terraform
+    type: git
+    ecl-ado-prj-iac/nm-factory-inf-pip-terraform
+  - repository: nm-factory-k8s-env-helm
+    type: git
+    ecl-ado-prj-iac/nm-factory-k8s-env-helm
+  - repository: nm-factory-k8s-env-helmdev
+    type: git
+    ecl-ado-prj-iac/nm-factory-k8s-env-helmdev
+  - repository: nm-factory-k8s-env-helmdpro
+    type: git
+    ecl-ado-prj-iac/nm-factory-k8s-env-helmdpro
+  - repository: nm-factory-k8s-env-helmdprodev
+    type: git
+    ecl-ado-prj-iac/nm-factory-k8s-env-helmdprodev
+  - repository: nm-factory-k8s-pip-operations
+    type: git
+    ecl-ado-prj-iac/nm-factory-k8s-pip-operations
 
 
 jobs:

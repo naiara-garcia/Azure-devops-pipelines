@@ -76,7 +76,7 @@ jobs:
       echo "az devops login"
       echo $(System.AccessToken) | az devops login
       echo "az repos list"
-      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl > /tmp/repoUrls.list
+      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"' > /tmp/repoUrls.list
 
       while read repoUrl; 
       do 

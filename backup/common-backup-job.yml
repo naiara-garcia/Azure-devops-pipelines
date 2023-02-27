@@ -23,8 +23,6 @@ jobs:
 
 
   steps:
-#  - checkout: nm-factory-inf-env-dev
-#  - checkout: nm-factory-inf-env-pro
   - script: |
       echo "Clone repositories configured as resources"
       echo "az config"

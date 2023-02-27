@@ -89,7 +89,7 @@ jobs:
         echo "Current Azure account:"
         az account show
         az extension add -n azure-devops
-        az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac
+        az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac --subscription 45152bab-ec81-45e0-af27-13f57a380423
 
 
   - task: AzureCLI@2

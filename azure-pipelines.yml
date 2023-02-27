@@ -87,8 +87,7 @@ jobs:
       echo $(System.AccessToken) | az devops login
       echo "az repos list"
       az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].name
-      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --branch master --depth 1 https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
-
+      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
 
 
   - task: AzureCLI@2

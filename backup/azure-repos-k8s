@@ -1,0 +1,34 @@
+name: nm-factory-inf-pip-operation-backup-repos-k8s
+
+pool:
+  name: Factory-VSS-Agents
+
+schedules:
+- cron: "20 2 * * *"
+  displayName: Nightly backup
+  branches:
+    include:
+    - main
+    - initial
+  always: true
+
+resources:
+  repositories:
+  - repository: nm-factory-k8s-env-helm
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helm
+  - repository: nm-factory-k8s-env-helmdev
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helmdev
+  - repository: nm-factory-k8s-env-helmdpro
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helmdpro
+  - repository: nm-factory-k8s-env-helmdprodev
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helmdprodev
+  - repository: nm-factory-k8s-pip-operations
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-pip-operations
+    
+jobs:
+- template: common-backup-jobs.yml

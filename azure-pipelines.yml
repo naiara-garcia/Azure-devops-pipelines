@@ -78,7 +78,7 @@ jobs:
       echo "az repos list"
       az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl > /tmp/repoUrls.list
 
-      while read repoUrl; 
+      #while read repoUrl; 
       #do 
       #  echo "Cloning $repoUrl"
       #  git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl

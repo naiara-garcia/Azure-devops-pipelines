@@ -1,3 +1,5 @@
+trigger: none
+
 name: nm-factory-inf-pip-operation
 
 pool:

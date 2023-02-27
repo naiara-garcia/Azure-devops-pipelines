@@ -1,5 +1,13 @@
 name: nm-factory-inf-pip-operation
 
+parameters: 
+- name: repositories
+  type: string
+  default: default
+  values:
+  - nm-factory-inf-env-dev
+  - nm-factory-inf-env-pro
+
 pool:
   name: Factory-VSS-Agents
 
@@ -29,14 +37,11 @@ schedules:
 
 resources:
   repositories:
-  - repository: nm-factory-inf-env-dev
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-env-dev
-    path: repositories
-  - repository: nm-factory-inf-env-pro
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
-    path: repositories
+  - ${{each repo in parameters.repositories}}:
+    - repository: ${{ repo }}
+      type: git
+      name: ecl-ado-prj-iac/${{ repo }}
+      path: repositories
 
 jobs:
 - job:

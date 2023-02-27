@@ -37,6 +37,11 @@ resources:
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
     path: repositories
+  - repository: nm-factory-inf-mod-vm
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-mod-vm
+    path: repositories
+
 
 jobs:
 - job:
@@ -78,28 +83,8 @@ jobs:
       az config set extension.use_dynamic_install=yes_without_prompt
       echo $(System.AccessToken) | az devops login
       az account show
-      az account set --subscription 45152bab-ec81-45e0-af27-13f57a380423
       az extension add -n azure-devops
-      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac --subscription 45152bab-ec81-45e0-af27-13f57a380423
-
-
-
-  - task: AzureCLI@2
-    displayName: "List repositories"
-    inputs:
-      azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        #!/bin/bash
-
-        ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
-        echo "##vso[task.setvariable variable=ACCOUNT_KEY]${ACCOUNT_KEY}"
-      
-        echo "Current Azure account:"
-        az account show
-        az extension add -n azure-devops
-        az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac --subscription 45152bab-ec81-45e0-af27-13f57a380423
+      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].name
 
 
   - task: AzureCLI@2

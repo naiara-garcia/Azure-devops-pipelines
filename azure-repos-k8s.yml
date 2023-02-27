@@ -1,0 +1,17 @@
+resources:
+  repositories:
+   - repository: nm-factory-k8s-env-helm
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helm
+  - repository: nm-factory-k8s-env-helmdev
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helmdev
+  - repository: nm-factory-k8s-env-helmdpro
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helmdpro
+  - repository: nm-factory-k8s-env-helmdprodev
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-env-helmdprodev
+  - repository: nm-factory-k8s-pip-operations
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-k8s-pip-operations

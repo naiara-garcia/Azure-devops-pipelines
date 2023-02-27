@@ -59,4 +59,4 @@ resources:
 
 
 jobs:
-- template: azure-pipelines.yml
+- template: common-backup-jobs.yml

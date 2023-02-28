@@ -17,7 +17,7 @@ jobs:
     value: "ecl-az-fact-stc-01-backups"
     readonly: true
   - name: RETENTION
-    value: "3 months" #"-1 days" or "-1 weeks" or "-1 month"
+    value: "-3 months" #"-1 days" or "-1 weeks" or "-1 month". IMPORTANT -> sign "-"
     readonly: true
 
 
@@ -86,6 +86,15 @@ jobs:
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
+
+        #Check if retention is negative
+        if echo $RETENTION | grep "-"; 
+        then 
+          echo "the RETENTION value is OK
+        else 
+          echo "the RETENTION value wrong. Possitive retention detected. Check RETENTION "";
+          exit 1 
+        fi
 
         thresholdDate=`date -d "${RETENTION}" +%Y%m%d%H%M%S`
 

@@ -45,4 +45,4 @@ resources:
 
   
 jobs:
-- template: common-backup-jobs.yml
+- template: utils/common-backup-jobs.yml

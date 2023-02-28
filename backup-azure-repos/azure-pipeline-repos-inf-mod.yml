@@ -1,5 +1,10 @@
 name: nm-factory-inf-pip-operation-backup-repos-inf-mod
 
+
+# REPOSITORY_COMPONENT_SUBCOMPONENT is composed of component and subcomponet strings.
+# The component could be "inf,ado,sec" "pip,mod,env"
+# The subcomponent could be "nothing, pip,mod,env".
+# Examples: "inf-mod", "inf", "k8s"
 variables:
 - name: REPOSITORY_COMPONENT_SUBCOMPONENT
   value: "inf-mod"

@@ -50,6 +50,7 @@ jobs:
       mkdir ./${LOCAL_FOLDER_NAME}
       mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
+      ls -lat
 
 
   - task: AzureCLI@2

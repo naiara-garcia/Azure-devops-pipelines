@@ -21,7 +21,6 @@ jobs:
     readonly: true
 
 
-
   steps:
   - script: |
       echo "Clone repositories configured as resources"
@@ -38,7 +37,6 @@ jobs:
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
       done < /tmp/repoUrls.list
       ls -lat
-
 
 
   - script: |

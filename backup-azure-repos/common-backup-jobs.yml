@@ -91,9 +91,12 @@ jobs:
         grep "${REPOSITORY_COMPONENT_SUBCOMPONENT}-20" /tmp/backups.list > /tmp/backups.list-aux
         mv /tmp/backups.list-aux /tmp/backups.list
 
+        echo "Files to be checked"
+        cat /tmp/backups.list
+
         while read line; 
         do 
-            fileDate=`basename $line | sed  's/azureGitRepos-${REPOSITORY_COMPONENT_SUBCOMPONENT}-//g' | sed 's/.tgz//'`
+            fileDate=`basename $line | sed  's/azureGitRepos-$REPOSITORY_COMPONENT_SUBCOMPONENT-//g' | sed 's/.tgz//'`
             echo "Comparison $fileDate -lt $thresholdDate"
             if [ "$fileDate" -lt "$thresholdDate" ]
             then

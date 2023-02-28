@@ -17,7 +17,7 @@ jobs:
     value: "ecl-az-fact-stc-01-backups"
     readonly: true
   - name: RETENTION
-    value: "-14 hours" #"-1 days" or "-1 weeks" or "-1 month"
+    value: "3 months" #"-1 days" or "-1 weeks" or "-1 month"
     readonly: true
 
 

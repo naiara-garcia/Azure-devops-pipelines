@@ -22,8 +22,7 @@ jobs:
 
 
   steps:
-  - displayName: "Clone repositories"
-    script: |
+  - script: |
       echo "Clone repositories configured as resources"
       echo "az config"
       az config set extension.use_dynamic_install=yes_without_prompt
@@ -39,10 +38,10 @@ jobs:
       done < /tmp/repoUrls.list
       echo "List downloaded repositories"
       ls -lat
+    displayName: "Clone repositories"
 
 
-  - displayName: "Package repositories in one backup file .tgz"
-    script: |
+  - script: |
       echo "Package backups"
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${REPOSITORY_COMPONENT_SUBCOMPONENT}-${LOCAL_FOLDER_NAME}.tgz"
@@ -54,6 +53,7 @@ jobs:
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
       echo "List files after packaging"
       ls -lat
+    displayName: "Package repositories in one backup file .tgz"
 
 
   - task: AzureCLI@2

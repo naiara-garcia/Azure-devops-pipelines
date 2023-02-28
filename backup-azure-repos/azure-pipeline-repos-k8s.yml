@@ -41,4 +41,4 @@ resources:
     name: ecl-ado-prj-iac/nm-factory-k8s-pip-operations
     
 jobs:
-- template: common-backup-jobs.yml
+- template: utils/common-backup-jobs.yml

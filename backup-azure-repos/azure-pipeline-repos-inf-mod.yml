@@ -1,5 +1,9 @@
 name: nm-factory-inf-pip-operation-backup-repos-inf-mod
 
+variables:
+- name: REPOSITORY_COMPONENT_SUBCOMPONENT
+  value: "inf-mod"
+
 pool:
   name: Factory-VSS-Agents
 

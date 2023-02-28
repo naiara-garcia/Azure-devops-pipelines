@@ -1,5 +1,6 @@
 name: nm-factory-inf-pip-operation-backup-repos-inf-mod
 
+trigger: none # will disable CI builds entirely
 
 # REPOSITORY_COMPONENT_SUBCOMPONENT is composed of component and subcomponet strings.
 # The component could be "inf,ado,sec" "pip,mod,env"

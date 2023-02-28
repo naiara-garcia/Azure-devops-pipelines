@@ -50,4 +50,4 @@ resources:
     name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform
 
 jobs:
-- template: common-backup-jobs.yml
+- template: utils/common-backup-jobs.yml

@@ -1,5 +1,13 @@
 name: nm-factory-inf-pip-operation-backup-repos-k8s
 
+# REPOSITORY_COMPONENT_SUBCOMPONENT is composed of component and subcomponet strings.
+# The component could be [inf,ado,sec]
+# The subcomponent could be [nothing,pip,mod,env].
+# Examples: "inf-mod", "inf", "k8s"
+variables:
+- name: REPOSITORY_COMPONENT_SUBCOMPONENT
+  value: "K8s"
+
 pool:
   name: Factory-VSS-Agents
 

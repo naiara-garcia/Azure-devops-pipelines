@@ -88,11 +88,11 @@ jobs:
       inlineScript: |
 
         #Check if retention is negative
-        if echo $RETENTION | grep "-"; 
+        if echo $RETENTION | grep "-" 
         then 
-          echo "the RETENTION value is OK
+          echo "the RETENTION value is OK"
         else 
-          echo "the RETENTION value wrong. Possitive retention detected. Check RETENTION "";
+          echo "the RETENTION value wrong. Possitive retention detected. Check RETENTION value"
           exit 1 
         fi
 

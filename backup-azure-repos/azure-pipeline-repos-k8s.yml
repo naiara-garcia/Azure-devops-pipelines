@@ -6,7 +6,7 @@ name: nm-factory-inf-pip-operation-backup-repos-k8s
 # Examples: "inf-mod", "inf", "k8s"
 variables:
 - name: REPOSITORY_COMPONENT_SUBCOMPONENT
-  value: "K8s"
+  value: "k8s"
 
 pool:
   name: Factory-VSS-Agents

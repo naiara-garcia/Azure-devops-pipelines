@@ -3,12 +3,12 @@ name: nm-factory-inf-pip-operation-backup-repos-dpl
 trigger: none # will disable CI builds entirely
 
 # REPOSITORY_COMPONENT_SUBCOMPONENT is composed of component and subcomponet strings.
-# The component could be [inf,ado,sec]
+# The component could be [inf,ado,sec,dpl,k8s]
 # The subcomponent could be [nothing,pip,mod,env].
 # Examples: "inf-mod", "inf", "k8s"
 variables:
 - name: REPOSITORY_COMPONENT_SUBCOMPONENT
-  value: "k8s"
+  value: "dpl"
 
 pool:
   name: Factory-VSS-Agents
@@ -25,23 +25,23 @@ schedules:
 resources:
   repositories:
   - repository: nm-factory-dpl-bsp-configuration
-  type: git
-  name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
-- repository: nm-factory-dpl-env-elastictesting
-  type: git
-  name: ecl-ado-prj-iac/nm-factory-dpl-env-elastictesting
-- repository: nm-factory-dpl-env-terraformfix
-  type: git
-  name: ecl-ado-prj-iac/nm-factory-dpl-env-terraformfix
-- repository: nm-factory-dpl-env-testing
-  type: git
-  name: ecl-ado-prj-iac/nm-factory-dpl-env-testing
-- repository: nm-factory-dpl-env-vaultcerts
-  type: git
-  name: ecl-ado-prj-iac/nm-factory-dpl-env-vaultcerts
-- repository: nm-factory-dpl-msc-docker
-  type: git
-  name: ecl-ado-prj-iac/nm-factory-dpl-msc-docker
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
+  - repository: nm-factory-dpl-env-elastictesting
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-dpl-env-elastictesting
+  - repository: nm-factory-dpl-env-terraformfix
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-dpl-env-terraformfix
+  - repository: nm-factory-dpl-env-testing
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-dpl-env-testing
+  - repository: nm-factory-dpl-env-vaultcerts
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-dpl-env-vaultcerts
+  - repository: nm-factory-dpl-msc-docker
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-dpl-msc-docker
 
   
 jobs:

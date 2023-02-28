@@ -45,6 +45,7 @@ jobs:
       echo "Package backups"
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${REPOSITORY_COMPONENT_SUBCOMPONENT}-${LOCAL_FOLDER_NAME}.tgz"
+      echo "##vso[task.setvariable variable=BACKUP_FILE]${BACKUP_FILE}"
       REPO_PREFIX="./nm-factory-*"
       ls -lat
       mkdir ./${LOCAL_FOLDER_NAME}
@@ -64,6 +65,7 @@ jobs:
         echo "BACKUP_FILE = ${BACKUP_FILE}"
 
         ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
+        echo "##vso[task.setvariable variable=ACCOUNT_KEY]${ACCOUNT_KEY}"
         az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
       
         echo "Upload backup file"

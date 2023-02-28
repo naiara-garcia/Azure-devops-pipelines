@@ -22,13 +22,14 @@ jobs:
 
 
   steps:
-  - script: |
+  - displayName: "Clone repositories"
+    script: |
       echo "Clone repositories configured as resources"
       echo "az config"
       az config set extension.use_dynamic_install=yes_without_prompt
-      echo "az devops login"
+      echo "Executing ... az devops login"
       echo $(System.AccessToken) | az devops login
-      echo "az repos list"
+      echo "Executing ... az repos list"
       az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"' > /tmp/repoUrls.list
 
       while read repoUrl; 
@@ -36,10 +37,12 @@ jobs:
         echo "Cloning $repoUrl"
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
       done < /tmp/repoUrls.list
+      echo "List downloaded repositories"
       ls -lat
 
 
-  - script: |
+  - displayName: "Package repositories in one backup file .tgz"
+    script: |
       echo "Package backups"
       LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
       BACKUP_FILE="azureGitRepos-${REPOSITORY_COMPONENT_SUBCOMPONENT}-${LOCAL_FOLDER_NAME}.tgz"
@@ -49,6 +52,7 @@ jobs:
       mkdir ./${LOCAL_FOLDER_NAME}
       mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
       tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
+      echo "List files after packaging"
       ls -lat
 
 
@@ -66,7 +70,7 @@ jobs:
         echo "##vso[task.setvariable variable=ACCOUNT_KEY]${ACCOUNT_KEY}"
         az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
       
-        echo "Upload backup file"
+        echo "Upload backup file:"
         az storage blob upload \
           --account-name ${ACCOUNT_NAME} \
           --account-key ${ACCOUNT_KEY} \
@@ -93,6 +97,7 @@ jobs:
 
         echo "Files to be checked"
         cat /tmp/backups.list
+        echo
 
         while read line; 
         do 

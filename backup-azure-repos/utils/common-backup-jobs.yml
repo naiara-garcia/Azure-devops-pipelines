@@ -1,0 +1,119 @@
+jobs:
+- job:
+  variables:
+  - name: BACKUP_FILE
+    value: ""
+  - name: CONTAINER_FOLDER
+    value: "azureGitRepos/backups"
+    readonly: true
+  - name: ORGANIZATION
+    value: "https://dev.azure.com/ecl-ado-factory/"
+    readonly: true
+  - name: ACCOUNT_NAME
+    value: "eclazfactsta01assets"
+    readonly: true
+  - name: CONTAINER_NAME
+    value: "ecl-az-fact-stc-01-backups"
+    readonly: true
+  - name: RETENTION
+    value: "-3 months" #"-1 days" or "-1 weeks" or "-1 month". IMPORTANT -> sign "-"
+    readonly: true
+
+
+  steps:
+  - script: |
+      echo "Clone repositories configured as resources"
+      echo "az config"
+      az config set extension.use_dynamic_install=yes_without_prompt
+      echo "Executing ... az devops login"
+      echo $(System.AccessToken) | az devops login
+      echo "Executing ... az repos list"
+      az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"' > /tmp/repoUrls.list
+
+      while read repoUrl; 
+      do 
+        echo "Cloning $repoUrl"
+        git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
+      done < /tmp/repoUrls.list
+      echo "List downloaded repositories"
+      ls -lat
+    displayName: "Clone repositories"
+
+
+  - script: |
+      echo "Package backups"
+      LOCAL_FOLDER_NAME=`date +%Y%m%d%H%M%S`
+      BACKUP_FILE="azureGitRepos-${REPOSITORY_COMPONENT_SUBCOMPONENT}-${LOCAL_FOLDER_NAME}.tgz"
+      echo "##vso[task.setvariable variable=BACKUP_FILE]${BACKUP_FILE}"
+      REPO_PREFIX="./nm-factory-*"
+      ls -lat
+      mkdir ./${LOCAL_FOLDER_NAME}
+      mv ${REPO_PREFIX} ./${LOCAL_FOLDER_NAME}
+      tar -cvzf ${BACKUP_FILE} ./${LOCAL_FOLDER_NAME}
+      echo "List files after packaging"
+      ls -lat
+    displayName: "Package repositories in one backup file .tgz"
+
+
+  - task: AzureCLI@2
+    displayName: "Upload backups"
+    inputs:
+      azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        #!/bin/bash
+        echo "BACKUP_FILE = ${BACKUP_FILE}"
+
+        ACCOUNT_KEY=$(az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value")
+        echo "##vso[task.setvariable variable=ACCOUNT_KEY]${ACCOUNT_KEY}"
+        az storage account keys list --account-name ${ACCOUNT_NAME} --query="[0].value"
+      
+        echo "Upload backup file:"
+        az storage blob upload \
+          --account-name ${ACCOUNT_NAME} \
+          --account-key ${ACCOUNT_KEY} \
+          --container-name ${CONTAINER_NAME} \
+          --file ${BACKUP_FILE} \
+          --name ${CONTAINER_FOLDER}/${BACKUP_FILE}
+
+
+  - task: AzureCLI@2
+    displayName: "Backup retention"
+    inputs:
+      azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+
+        #Check if retention is negative
+        if echo $RETENTION | grep "-" 
+        then 
+          echo "the RETENTION value is OK"
+        else 
+          echo "the RETENTION value wrong. Possitive retention detected. Check RETENTION value"
+          exit 1 
+        fi
+
+        thresholdDate=`date -d "${RETENTION}" +%Y%m%d%H%M%S`
+
+        az storage blob list --account-name ${ACCOUNT_NAME} --account-key ${ACCOUNT_KEY} --container-name ${CONTAINER_NAME} --prefix ${CONTAINER_FOLDER}/ | jq .[].name | tr -d "\"" > /tmp/backups.list
+
+        #Process only repositories with the same component and subcomponent
+        grep "${REPOSITORY_COMPONENT_SUBCOMPONENT}-20" /tmp/backups.list > /tmp/backups.list-aux
+        mv /tmp/backups.list-aux /tmp/backups.list
+
+        echo "Files to be checked"
+        cat /tmp/backups.list
+        echo
+
+        while read line; 
+        do 
+            fileDate=`basename $line | sed  "s/azureGitRepos-$REPOSITORY_COMPONENT_SUBCOMPONENT-//g" | sed 's/.tgz//'`
+            echo "Comparison $fileDate -lt $thresholdDate"
+            if [ "$fileDate" -lt "$thresholdDate" ]
+            then
+                echo "Backup cleaning: Removing object $line"
+                az storage blob delete --account-name ${ACCOUNT_NAME} --account-key ${ACCOUNT_KEY} --container-name ${CONTAINER_NAME} --name ${line}
+            fi
+        done < /tmp/backups.list

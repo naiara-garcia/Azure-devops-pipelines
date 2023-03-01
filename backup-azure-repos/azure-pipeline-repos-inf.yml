@@ -1,0 +1,55 @@
+name: nm-factory-inf-pip-operation-backup-repos-inf
+
+trigger: none # will disable CI builds entirely
+
+# REPOSITORY_COMPONENT_SUBCOMPONENT is composed of component and subcomponet strings.
+# The component could be [inf,ado,sec]
+# The subcomponent could be [nothing,pip,mod,env].
+# Examples: "inf-mod", "inf", "k8s"
+variables:
+- name: REPOSITORY_COMPONENT_SUBCOMPONENT
+  value: "inf"
+
+pool:
+  name: Factory-VSS-Agents
+
+schedules:
+- cron: "10 2 * * *"
+  displayName: Nightly backup
+  branches:
+    include:
+    - main
+    - initial
+  always: true
+
+resources:
+  repositories:
+  - repository: nm-factory-inf-env-ansible
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-ansible
+  - repository: nm-factory-inf-env-azdevops
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-azdevops
+  - repository: nm-factory-inf-env-dev
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-dev
+  - repository: nm-factory-inf-env-pro
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+  - repository: nm-factory-inf-env-seed
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-seed
+  - repository: nm-factory-inf-pip-certs
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-certs
+  - repository: nm-factory-inf-pip-operations
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
+  - repository: nm-factory-inf-pip-terraform
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform
+  - repository: nm-factory-inf-pip-backuptest
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-backuptest
+jobs:
+- template: utils/common-backup-jobs.yml

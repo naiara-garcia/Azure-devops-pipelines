@@ -19,7 +19,6 @@ schedules:
   branches:
     include:
     - main
-    - initial
   always: true
 
 resources:

@@ -48,8 +48,5 @@ resources:
   - repository: nm-factory-inf-pip-terraform
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform
-  - repository: nm-factory-inf-pip-backuptest
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-pip-backuptest
 jobs:
 - template: utils/common-backup-jobs.yml

@@ -1,0 +1,14 @@
+name: nm-factory-inf-pip-operation-maintenance-jenkinsagents-dpl-dev
+
+trigger: none # will disable CI builds entirely
+
+pool:
+  name: Factory-VSS-Agents
+
+# schedules:
+# - cron: "30 2 * * *"
+#   displayName: Nightly backup
+#   branches:
+#     include:
+#     - main
+#   always: true

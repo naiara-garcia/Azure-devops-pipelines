@@ -20,9 +20,9 @@ pool:
 #     name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
 
 stages:
-- stage: Recreate Jenkins Agent VM 
+- stage: recreate_jenkins_agent_vm 
   jobs:
-  - job: Recreate Jenkins Agent VM
+  - job: recreate_jenkins_agent_vm
     steps:
       - task: CloneRepository@2
         displayName: 'Cloning git repository'

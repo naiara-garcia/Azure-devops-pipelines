@@ -30,7 +30,7 @@ stages:
         az config set extension.use_dynamic_install=yes_without_prompt
         echo "Executing ... az devops login"
         echo $(System.AccessToken) | az devops login
-        az repos list --organization ${ORGANIZATION} --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"'
+        az repos list --organization "https://dev.azure.com/ecl-ado-factory/" --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"'
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
         ls -lat
     displayName: "Clone repositories"

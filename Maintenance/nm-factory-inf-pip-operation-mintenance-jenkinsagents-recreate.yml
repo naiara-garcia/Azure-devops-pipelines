@@ -20,17 +20,6 @@ pool:
 #     name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
 
 stages:
-- stage: Build
-  displayName: Build stage
-  jobs:  
-  - job: Build_api
-    displayName: Build API
-    steps:
-      - template: ./build-template.yml
-        parameters:
-          workingDirectory: '$(Build.Repository.LocalPath)/api'
-
-stages:
 - stage: Recreate Jenkins Agent VM 
   jobs:
   - job: Recreate Jenkins Agent VM

@@ -24,7 +24,7 @@ stages:
   jobs:
   - job: Recreate Jenkins Agent VM
     steps:
-      - task: Clone nm-factory-inf-env-dev repository
+      - task: CloneRepository@2
         displayName: 'Cloning git repository'
         inputs:
           script: |

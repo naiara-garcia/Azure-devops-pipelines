@@ -13,18 +13,12 @@ pool:
 #     - main
 #   always: true
 
-# resources:
-#   repositories:
-#   - repository: nm-factory-dpl-bsp-configuration
-#     type: git
-#     name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
-
 resources:
   repositories:
-  - repository: nm-factory-dpl-bsp-configuration
+  - repository: nm-factory-inf-env-dev
     type: git
-    name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
-    
+    name: ecl-ado-prj-iac/nm-factory-inf-env-dev
+
 stages:
 - stage: recreate_jenkins_agent_vm 
   jobs:
@@ -36,13 +30,6 @@ stages:
         az config set extension.use_dynamic_install=yes_without_prompt
         echo "Executing ... az devops login"
         echo $(System.AccessToken) | az devops login
-        az repos list --organization https://dev.azure.com/ecl-ado-factory/ --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"' > /tmp/repoUrls.list
-        cat /tmp/repoUrls.list
-        while read repoUrl; 
-        do 
-          echo "Cloning $repoUrl"
-          git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror $repoUrl
-        done < /tmp/repoUrls.list
-        echo "List downloaded repositories"
+        git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
         ls -lat
       displayName: "Clone repositories"

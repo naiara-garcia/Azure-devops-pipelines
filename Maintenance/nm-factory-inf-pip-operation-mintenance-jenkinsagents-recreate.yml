@@ -25,11 +25,11 @@ stages:
   - job: recreate_jenkins_agent_vm
     steps:
     - script: |
-      echo "Cloning repository"
-      echo "az config"
-      az config set extension.use_dynamic_install=yes_without_prompt
-      echo "Executing ... az devops login"
-      echo $(System.AccessToken) | az devops login
-      git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
-      ls -lat
-  displayName: "Clone repositories"
+        echo "Cloning repository"
+        echo "az config"
+        az config set extension.use_dynamic_install=yes_without_prompt
+        echo "Executing ... az devops login"
+        echo $(System.AccessToken) | az devops login
+        git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
+        ls -lat
+    displayName: "Clone repositories"

@@ -19,19 +19,16 @@ pool:
 #     type: git
 #     name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
 
-  steps:
-  - task: Clone nm-factory-inf-env-dev repository
-    displayName: 'Cloning git repository'
-    inputs:
-      script: |
-        echo 'Cloning into sources folder at: $(Build.SourcesDirectory)'
-        git clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
-        exit
-
-# - task: Recreate Jenkins Agent VM
-#   displayName: 'Recreate Jenkins Agent VM'
-#   inputs:
-#     script: |
-#       echo 'Cloning into sources folder at: $(Build.SourcesDirectory)'
-#       git clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
-#       exit      
+  stages:
+  - stage: Recreate Jenkins Agent VM 
+    jobs:
+    - job: Recreate Jenkins Agent VM
+   
+    steps:
+    - task: Clone nm-factory-inf-env-dev repository
+      displayName: 'Cloning git repository'
+      inputs:
+        script: |
+          echo 'Cloning into sources folder at: $(Build.SourcesDirectory)'
+          git clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
+          exit

@@ -31,7 +31,7 @@ stages:
         echo "Executing ... az devops login"
         echo $(System.AccessToken) | az devops login
         az repos list --organization https://dev.azure.com/ecl-ado-factory/ --project ecl-ado-prj-iac | jq .[].remoteUrl | tr -d '"' > /tmp/repoUrls.list
-
+        cat /tmp/repoUrls.list
         while read repoUrl; 
         do 
           echo "Cloning $repoUrl"

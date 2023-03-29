@@ -19,7 +19,7 @@ pool:
 #     type: git
 #     name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
 
- steps:
+  steps:
   - task: Clone nm-factory-inf-env-dev repository
     displayName: 'Cloning git repository'
     inputs:

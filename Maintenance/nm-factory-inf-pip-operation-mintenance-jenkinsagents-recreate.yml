@@ -33,4 +33,6 @@ stages:
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" --mirror https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
         ls -lat
         cd nm-factory-inf-env-dev.git
+        pwd
+        ls -lat
       displayName: "Clone repositories"

@@ -24,9 +24,7 @@ stages:
   jobs:
   - job: recreate_jenkins_agent_vm
     steps:
-      - task: CloneRepository@2
-        displayName: 'Cloning git repository'
-        inputs:
+      - inputs:
           script: |
             echo 'Cloning into sources folder at: $(Build.SourcesDirectory)'
             git clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev

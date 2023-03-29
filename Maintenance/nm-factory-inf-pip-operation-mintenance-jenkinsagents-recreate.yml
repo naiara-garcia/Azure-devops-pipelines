@@ -1,7 +1,7 @@
 name: nm-factory-inf-pip-operation-maintenance-jenkinsagents-dpl-dev
 
 trigger: none # will disable CI builds entirely
-
+ 
 pool:
   name: Factory-VSS-Agents
 
@@ -12,3 +12,25 @@ pool:
 #     include:
 #     - main
 #   always: true
+
+# resources:
+#   repositories:
+#   - repository: nm-factory-dpl-bsp-configuration
+#     type: git
+#     name: ecl-ado-prj-iac/nm-factory-dpl-bsp-configuration
+
+- task: Clone nm-factory-inf-env-dev repository
+  displayName: 'Cloning git repository'
+  inputs:
+    script: |
+      echo 'Cloning into sources folder at: $(Build.SourcesDirectory)'
+      git clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
+      exit
+
+# - task: Recreate Jenkins Agent VM
+#   displayName: 'Recreate Jenkins Agent VM'
+#   inputs:
+#     script: |
+#       echo 'Cloning into sources folder at: $(Build.SourcesDirectory)'
+#       git clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
+#       exit      

@@ -62,10 +62,20 @@ stages:
           [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
           [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
           chmod 600 ~/.ssh/id_rsa
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-seed-kvt-01-tfkv'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-seed-kvt-01-tfkv'
+        SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
+        RunAsPreJob: true
+        
     - task: AzureCLI@2
       displayName: "Run Terraform" 
       env:
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489" # Must move to KeyValut or inside provider.tf
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
       inputs:
         azureSubscription: 'ecl-az-fact-svc-01-armconnection'
         scriptType: 'bash'
@@ -76,9 +86,6 @@ stages:
           set -o errexit  # Exit on error
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
-          
-          export ARM_CLIENT_SECRET=$(az keyvault secret download --name terraform-app-secret --vault-name ecl-az-seed-kvt-01-tfkv)
-          export ARM_CLIENT_ID=$(az keyvault secret download --name terraform-app-client-id --vault-name ecl-az-seed-kvt-01-tfkv)
 
           cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
           ls -lat

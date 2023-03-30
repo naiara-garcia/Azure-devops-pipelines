@@ -41,8 +41,6 @@ stages:
       inputs:
         terraformVersion: 1.3.0
 
-      displayName: "Install Terraform"
-
     - script: |
         echo "terraform -v"
         terraform -v

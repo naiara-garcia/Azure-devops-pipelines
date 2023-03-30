@@ -62,13 +62,22 @@ stages:
           [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
           [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
           chmod 600 ~/.ssh/id_rsa
-          
-    - script: |
-        cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
-        ls -lat
-        pwd
-        echo "terraform init"
-        terraform init
-        echo "terraform plan"
-        terraform plan
-      displayName: "Run Terraform"      
+    - task: AzureCLI@2
+      displayName: "Run Terraform" 
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+
+          set -o errexit  # Exit on error
+          set -o nounset  # Exit on uninitalized vars
+          set -o pipefail # Exit on pipe exec fail
+
+          cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
+          ls -lat
+          pwd
+          echo "terraform init"
+          terraform init
+          echo "terraform plan"

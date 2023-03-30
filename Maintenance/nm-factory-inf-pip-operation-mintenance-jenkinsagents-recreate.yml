@@ -35,6 +35,13 @@ stages:
         sudo mv ./terraform /usr/local/bin/
       displayName: "Install Terraform"
 
+    - task: AzureCLI@2
+      displayName: 'Install SSH Keys'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: bash
+        scriptPath: '$(System.DefaultWorkingDirectory)/_pipeline/bash/az_ssh_install.sh'
+
     - script: |
         echo "Cloning repository"
         echo "az config"

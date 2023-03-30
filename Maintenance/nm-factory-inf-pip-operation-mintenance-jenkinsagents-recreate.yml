@@ -43,7 +43,7 @@ stages:
       displayName: "Clone repository"
 
     - script: |
-        cd nm-factory-inf-env-dev
+        cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
         ls -lat
         pwd
         echo "terraform init"

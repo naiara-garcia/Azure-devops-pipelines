@@ -45,6 +45,7 @@ stages:
 
     - script: |
         ls -lat
+        pwd
         echo "terraform init"
         terraform init
         echo "terraform plan"

@@ -35,4 +35,13 @@ stages:
         cd nm-factory-inf-env-dev
         pwd
         ls -lat
-      displayName: "Clone repositories"
+      displayName: "Clone repository"
+    - script: |
+        echo "Installing Terraform"
+        echo $PATH
+        echo "wget -q "https://releases.hashicorp.com/terraform/1.3.0/terraform_1.3.0_linux_amd64.zip"; unzip terraform_1.3.0_linux_amd64.zip"
+        wget -q "https://releases.hashicorp.com/terraform/1.3.0/terraform_1.3.0_linux_amd64.zip"; unzip terraform_1.3.0_linux_amd64.zip
+        echo "Move terraform binary to /usr/local/bin"
+        mv ./terraform /usr/local/bin/
+        terraform -v
+      displayName: "Install Terraform"

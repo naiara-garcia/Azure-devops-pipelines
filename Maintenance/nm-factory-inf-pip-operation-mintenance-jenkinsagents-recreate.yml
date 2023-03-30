@@ -94,4 +94,4 @@ stages:
           echo "terraform init"
           terraform init
           echo "terraform plan"
-          terraform plan
+          terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent

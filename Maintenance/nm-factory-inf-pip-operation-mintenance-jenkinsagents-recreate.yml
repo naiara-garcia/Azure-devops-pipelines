@@ -40,10 +40,10 @@ stages:
         echo $(System.AccessToken) | az devops login
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev
         ls -lat
-        cd nm-factory-inf-env-dev
       displayName: "Clone repository"
 
     - script: |
+        cd nm-factory-inf-env-dev
         ls -lat
         pwd
         echo "terraform init"

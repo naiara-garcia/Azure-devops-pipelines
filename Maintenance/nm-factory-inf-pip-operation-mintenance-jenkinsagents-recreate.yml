@@ -18,6 +18,9 @@ resources:
   - repository: nm-factory-inf-env-dev
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-dev
+  - repository: nm-factory-inf-env-dev
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-mod-naming
 
 stages:
 - stage: recreate_jenkins_agent_vm 

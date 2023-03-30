@@ -64,6 +64,7 @@ stages:
 
     - script: |
         export ARM_TENANT_ID="9e296acd-1e44-44f0-8c77-cc9dbce85489"
+        az login
         echo "terraform plan"
         terraform plan
         cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev

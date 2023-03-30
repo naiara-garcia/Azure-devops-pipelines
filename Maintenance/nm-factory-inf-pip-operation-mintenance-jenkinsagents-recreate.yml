@@ -62,12 +62,18 @@ stages:
           [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
           chmod 600 ~/.ssh/id_rsa
 
+          export ARM_CLIENT_ID=$servicePrincipalId
+          export ARM_CLIENT_SECRET=$servicePrincipalKey
+          export ARM_TENANT_ID=$tenantId
+          cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
+          terraform init
+
     - script: |
-        echo "terraform plan"
-        terraform plan
         cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
         ls -lat
         pwd
         echo "terraform init"
         terraform init
+        echo "terraform plan"
+        terraform plan
       displayName: "Run Terraform"      

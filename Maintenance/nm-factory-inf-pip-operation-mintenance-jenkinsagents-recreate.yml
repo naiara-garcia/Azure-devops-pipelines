@@ -48,26 +48,27 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-            #!/bin/bash
+          #!/bin/bash
 
-            set -o errexit  # Exit on error
-            set -o nounset  # Exit on uninitalized vars
-            set -o pipefail # Exit on pipe exec fail
+          set -o errexit  # Exit on error
+          set -o nounset  # Exit on uninitalized vars
+          set -o pipefail # Exit on pipe exec fail
 
-            VAULT_NAME="ecl-az-fact-kvt-01-main"
+          VAULT_NAME="ecl-az-fact-kvt-01-main"
 
-            [ -d ~/.ssh ] || mkdir ~/.ssh
-            [ -f ~/.ssh/id_rsa ] || az keyvault secret download --name poc-prv-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa
-            [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
-            [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
-            chmod 600 ~/.ssh/id_rsa
+          [ -d ~/.ssh ] || mkdir ~/.ssh
+          [ -f ~/.ssh/id_rsa ] || az keyvault secret download --name poc-prv-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa
+          [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
+          [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_rsa
 
     - script: |
-      cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
-      ls -lat
-      pwd
-      echo "terraform init"
-      terraform init
-      echo "terraform plan"
-      terraform plan
-    displayName: "Run Terraform"      
+        export ARM_TENANT_ID="9e296acd-1e44-44f0-8c77-cc9dbce85489"
+        cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
+        ls -lat
+        pwd
+        echo "terraform init"
+        terraform init
+        echo "terraform plan"
+        terraform plan
+      displayName: "Run Terraform"      

@@ -95,25 +95,3 @@ stages:
           terraform init
           echo "terraform plan"
           terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent
-
-    - task: AzureCLI@2
-      displayName: "Recreate DPRO Jenkins Agent" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash
-
-          set -o errexit  # Exit on error
-          set -o nounset  # Exit on uninitalized vars
-          set -o pipefail # Exit on pipe exec fail
-          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-dev/200-jenkins-agent-dpro-dev
-          echo "terraform init"
-          terraform init
-          echo "terraform plan"
-          terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent          

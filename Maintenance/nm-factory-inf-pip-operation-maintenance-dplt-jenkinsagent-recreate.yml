@@ -1,4 +1,4 @@
-name: nm-factory-inf-pip-operation-maintenance-jenkinsagents-dpl-dev
+name: nm-factory-inf-pip-operation-maintenance-dplt-jenkinsagent-recreate
 
 trigger: none # will disable CI builds entirely
  

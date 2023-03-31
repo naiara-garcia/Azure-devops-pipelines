@@ -51,6 +51,8 @@ stages:
         echo "Executing ... az devops login"
         echo $(System.AccessToken) | az devops login
         git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" ${TF_REPOSITORY}
+        pwd
+        ls -lat
       displayName: "Clone Terraform repository"
     
     - task: AzureCLI@2
@@ -91,8 +93,9 @@ stages:
           set -o errexit  # Exit on error
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
-
-          cd nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
+          pwd
+          ls -lat
+          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
           echo "terraform init"
           terraform init
           echo "terraform plan"

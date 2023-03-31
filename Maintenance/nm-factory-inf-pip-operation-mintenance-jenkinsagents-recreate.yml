@@ -73,6 +73,7 @@ stages:
           [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
           [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
           chmod 600 ~/.ssh/id_rsa
+          echo  '$(System.DefaultWorkingDirectory)'
         
     - task: AzureCLI@2
       displayName: "Run Terraform" 

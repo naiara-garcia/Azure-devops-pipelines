@@ -53,3 +53,5 @@ stages:
             "login": "'"${{parameters.login}}"'",
           }
         }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false"
+      env:
+        OKTA_TOKEN: $(okta-token)

@@ -6,8 +6,8 @@ pool:
   name: Factory-VSS-Agents
 
 schedules:
-- cron: "15 9 * * *"
-  displayName: Nightly backup
+- cron: "15 7 * * *"
+  displayName: Nightly recreate DPLT Jenkins Agent
   branches:
     include:
     - jenkins-agents
@@ -15,14 +15,14 @@ schedules:
 
 variables:
 - name: TF_REPOSITORY
-  value: "https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-dev"
+  value: "https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-pro"
 
 resources:
   repositories:
-  - repository: nm-factory-inf-env-dev
+  - repository: nm-factory-inf-env-pro
     type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-env-dev
-  - repository: nm-factory-inf-env-dev
+    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+  - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-mod-naming
 
@@ -90,7 +90,7 @@ stages:
           set -o errexit  # Exit on error
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
-          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
+          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
           echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"

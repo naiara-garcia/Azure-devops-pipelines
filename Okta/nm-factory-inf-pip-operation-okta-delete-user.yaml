@@ -1,0 +1,29 @@
+name: nm-factory-inf-pip-operation-okta-create-user
+
+trigger: none # will disable CI builds entirely
+ 
+pool:
+  name: Factory-VSS-Agents
+
+parameters:
+- name: firstName
+  displayName: First Name
+  type: string
+
+- name: lastName
+  displayName: Last Name
+  type: string
+
+- name: email
+  displayName: Email
+  type: string
+
+- name: login
+  displayName: Login
+  type: string
+
+stages:
+- stage: create_okta_user
+  jobs:
+  - job: create_okta_user
+    steps:

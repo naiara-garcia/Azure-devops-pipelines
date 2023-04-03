@@ -5,13 +5,13 @@ trigger: none # will disable CI builds entirely
 pool:
   name: Factory-VSS-Agents
 
-# schedules:
-# - cron: "30 2 * * *"
-#   displayName: Nightly backup
-#   branches:
-#     include:
-#     - main
-#   always: true
+schedules:
+- cron: "15 9 * * *"
+  displayName: Nightly backup
+  branches:
+    include:
+    - jenkins-agents
+  always: true
 
 variables:
 - name: TF_REPOSITORY
@@ -93,5 +93,5 @@ stages:
           cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-dev/200-jenkins-agent-dplt-dev
           echo "terraform init"
           terraform init
-          echo "terraform plan"
-          terraform plan
+          echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"
+          terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent

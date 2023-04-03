@@ -6,7 +6,7 @@ pool:
   name: Factory-VSS-Agents
 
 schedules:
-- cron: "15 7 * * *"
+- cron: "10 8 * * *"
   displayName: Nightly recreate DPLT Jenkins Agent
   branches:
     include:
@@ -22,7 +22,7 @@ resources:
   - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
-  - repository: nm-factory-inf-env-pro
+  - repository: nm-factory-inf-mod-naming
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-mod-naming
 

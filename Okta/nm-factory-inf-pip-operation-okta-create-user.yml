@@ -50,7 +50,7 @@ stages:
             "firstName": "'"${{parameters.firstName}}"'",
             "lastName": "'"${{parameters.lastName}}"'",
             "email": "'"${{parameters.email}}"'",
-            "login": "'"${{parameters.login}}"'",
+            "login": "'"${{parameters.login}}"'"
           }
         }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false"
       env:

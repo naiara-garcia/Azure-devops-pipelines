@@ -52,6 +52,6 @@ stages:
             "email": "'"${{parameters.email}}"'",
             "login": "'"${{parameters.login}}"'"
           }
-        }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false"
+        }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq
       env:
         OKTA_TOKEN: $(okta-token)

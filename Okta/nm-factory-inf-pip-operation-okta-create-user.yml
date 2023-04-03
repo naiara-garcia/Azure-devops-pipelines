@@ -47,12 +47,9 @@ stages:
         -H "Authorization: SSWS ${OKTA_TOKEN}" \
         -d '{
           "profile": {
-            "firstName": ${{parameters.firstName}},
-            "lastName": ${{parameters.lastName}},
-            "email": ${{parameters.email}},
-            "login": ${{parameters.login}},
+            "firstName": "'"${{parameters.firstName}}"'",
+            "lastName": "'"${{parameters.lastName}}"'",
+            "email": "'"${{parameters.email}}"'",
+            "login": "'"${{parameters.login}}"'",
           }
         }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false"
-
-      env:
-        OKTA_TOKEN: $(okta-token)

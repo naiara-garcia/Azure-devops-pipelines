@@ -6,7 +6,7 @@ pool:
   name: Factory-VSS-Agents
 
 schedules:
-- cron: "10 8 * * *"
+- cron: "0 1 * * *"
   displayName: Nightly recreate DPLT Jenkins Agent
   branches:
     include:
@@ -93,5 +93,5 @@ stages:
           cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
-          echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"
-          terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent
+          echo "terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"
+          terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent

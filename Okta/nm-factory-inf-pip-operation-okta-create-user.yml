@@ -41,7 +41,7 @@ stages:
         RunAsPreJob: true
 
     - bash: |
-        curl --show-error --fail -X POST \
+        curl --fail --silent -o /dev/null -w '{"http_code": "%{http_code}"}' -X POST \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         -H "Authorization: SSWS ${OKTA_TOKEN}" \
@@ -52,6 +52,7 @@ stages:
             "email": "'"${{parameters.email}}"'",
             "login": "'"${{parameters.login}}"'"
           }
-        }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq
+        }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary }"
       env:
         OKTA_TOKEN: $(okta-token)
+

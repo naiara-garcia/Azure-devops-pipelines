@@ -56,7 +56,7 @@ stages:
               "email": "'"${{parameters.email}}"'",
               "login": "'"${{parameters.login}}"'"
             }
-          }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary }"
+          }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq
       env:
         OKTA_TOKEN: $(okta-token)
 

@@ -11,7 +11,7 @@ parameters:
   type: string
 
 - name: action
-  displayName: Email
+  displayName: Action
   type: string
   default: Deprovision
   values:

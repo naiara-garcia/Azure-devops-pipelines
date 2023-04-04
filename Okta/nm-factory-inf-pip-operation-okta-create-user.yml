@@ -45,7 +45,7 @@ stages:
         targetType: 'inline'
         failOnStderr: true
         script: |
-          curl --no-progress-meter -o /dev/null -w '{"http_code": "%{http_code}"}' -X POST \
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \

@@ -10,7 +10,7 @@ schedules:
   displayName: Nightly recreate DPLT Jenkins Agent
   branches:
     include:
-    - jenkins-agents
+    - main
   always: true
 
 variables:

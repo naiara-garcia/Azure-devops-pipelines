@@ -44,8 +44,6 @@ stages:
       inputs:
         targetType: 'inline'
         failOnStderr: true
-        env:
-          OKTA_TOKEN: $(okta-token)
         script: |
           curl --fail --silent -o /dev/null -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
@@ -59,4 +57,6 @@ stages:
               "login": "'"${{parameters.login}}"'"
             }
           }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary }"
+      env:
+        OKTA_TOKEN: $(okta-token)
 

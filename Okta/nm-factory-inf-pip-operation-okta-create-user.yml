@@ -60,7 +60,7 @@ stages:
 
           cat resp.json
 
-          if [[ $(jq .http_code resp.json) -ge 400 ]]
+          if [[ $(jq .http_code resp.json) -ge 400 ]]; then
             echo "Operation Failed"
             exit -1
           else

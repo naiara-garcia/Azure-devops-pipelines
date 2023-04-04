@@ -6,24 +6,56 @@ pool:
   name: Factory-VSS-Agents
 
 parameters:
-- name: firstName
-  displayName: First Name
-  type: string
-
-- name: lastName
-  displayName: Last Name
-  type: string
-
 - name: email
   displayName: Email
   type: string
 
-- name: login
-  displayName: Login
+- name: oktaDomain
+  displayName: Okta Domain
   type: string
+  default: "iam-nm-dev-dplt-admin.okta.com"
 
 stages:
 - stage: create_okta_user
   jobs:
   - job: create_okta_user
     steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-fact-kvt-01-main'
+        SecretsFilter: 'okta-token'
+        RunAsPreJob: true
+
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        failOnStderr: true
+        script: |
+          echo "Getting user id for ${{parameters.email}}."
+          curl GET --no-progress-meter -w '{"http_code": "%{http_code}"}' \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          "https://${{parameters.oktaDomain}}/api/v1/users/${{parameters.email}}" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp_get.json
+
+          echo "ID: ${user_id}"
+          user_id=$(jq ".id" resp_get.json | tr -d '"')
+
+          if [ ${#user_id} -eq 4 ]; then
+              echo "User email ${{parameters.email}} not found in OKTA"
+              cat resp_get.json
+              exit -1
+          else
+              echo "Deleting user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
+              echo "Current status is $(jq ".status" resp_get.json)"
+              # echo "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=true"
+              curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: SSWS ${OKTA_TOKEN}" \
+              "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=false" | jq
+          fi
+      env:
+        OKTA_TOKEN: $(okta-token)

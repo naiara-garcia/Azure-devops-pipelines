@@ -10,6 +10,14 @@ parameters:
   displayName: Email
   type: string
 
+- name: action
+  displayName: Email
+  type: string
+  default: Deprovision
+  values:
+    - Deprovision
+    - Delete   
+
 - name: oktaDomain
   displayName: Okta Domain
   type: string
@@ -41,6 +49,7 @@ stages:
           "https://${{parameters.oktaDomain}}/api/v1/users/${{parameters.email}}" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp_get.json
 
           user_id=$(jq ".id" resp_get.json | tr -d '"')
+          status=$(jq ".status" resp_get.json | tr -d '"')
           echo "ID: ${user_id}"
 
           if [ ${#user_id} -eq 4 ]; then
@@ -48,14 +57,27 @@ stages:
               cat resp_get.json
               exit -1
           else
-              echo "Deleting user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
-              echo "Current status is $(jq ".status" resp_get.json)"
-              # echo "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=true"
-              curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
-              -H "Accept: application/json" \
-              -H "Content-Type: application/json" \
-              -H "Authorization: SSWS ${OKTA_TOKEN}" \
-              "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=false" | jq
+              echo "Current status is $status"
+
+              if [[ $status =! "DEPROVISIONED" ]];then
+                echo "Deprovisioning user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
+                curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
+                -H "Accept: application/json" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: SSWS ${OKTA_TOKEN}" \
+                "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=false" | jq
+              fi
+
+              if [[ ${{parameters.action}} == "Deprovision" ]];then
+                echo "User already DEPROVISIONED. No more action required."
+              else
+                echo "Deleting user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
+                curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
+                -H "Accept: application/json" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: SSWS ${OKTA_TOKEN}" \
+                "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=false" | jq
+              fi
           fi
       env:
         OKTA_TOKEN: $(okta-token)

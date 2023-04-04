@@ -56,7 +56,17 @@ stages:
               "email": "'"${{parameters.email}}"'",
               "login": "'"${{parameters.login}}"'"
             }
-          }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary, errorCauses: .errorCauses }"
+          }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+
+          cat resp.json
+
+          if [[ $(jq .http_code resp.json) -ge 400 ]]
+            echo "Operation Failed"
+            exit -1
+          else
+            echo "Operation Successfull"
+            exit 0
+          fi
       env:
         OKTA_TOKEN: $(okta-token)
 

@@ -34,7 +34,7 @@ stages:
         failOnStderr: true
         script: |
           echo "Getting user id for ${{parameters.email}}."
-          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' GET \
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \

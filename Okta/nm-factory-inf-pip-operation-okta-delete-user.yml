@@ -59,7 +59,7 @@ stages:
           else
               echo "Current status is $status"
 
-              if [[ $status =! "DEPROVISIONED" ]];then
+              if [[ $status != "DEPROVISIONED" ]];then
                 echo "Deprovisioning user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
                 curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
                 -H "Accept: application/json" \

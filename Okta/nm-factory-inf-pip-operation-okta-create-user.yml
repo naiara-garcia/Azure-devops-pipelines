@@ -18,10 +18,6 @@ parameters:
   displayName: Email
   type: string
 
-- name: login
-  displayName: Login
-  type: string
-
 - name: oktaDomain
   displayName: Okta Domain
   type: string
@@ -54,7 +50,7 @@ stages:
               "firstName": "'"${{parameters.firstName}}"'",
               "lastName": "'"${{parameters.lastName}}"'",
               "email": "'"${{parameters.email}}"'",
-              "login": "'"${{parameters.login}}"'"
+              "login": "'"${{parameters.email}}"'"
             }
           }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
 

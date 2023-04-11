@@ -43,6 +43,7 @@ stages:
 
     - checkout: nm-factory-inf-env-pro
       path: nm-factory-inf-env-pro
+      persistCredentials: true
 
     # - script: |
     #     echo "Cloning Terraform repository"
@@ -53,26 +54,26 @@ stages:
     #     git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" ${TF_REPOSITORY}
     #   displayName: "Clone Terraform repository"
     
-    - task: AzureCLI@2
-      displayName: "Install SSH keys"
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash
+    # - task: AzureCLI@2
+    #   displayName: "Install SSH keys"
+    #   inputs:
+    #     azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+    #     scriptType: 'bash'
+    #     scriptLocation: 'inlineScript'
+    #     inlineScript: |
+    #       #!/bin/bash
 
-          set -o errexit  # Exit on error
-          set -o nounset  # Exit on uninitalized vars
-          set -o pipefail # Exit on pipe exec fail
+    #       set -o errexit  # Exit on error
+    #       set -o nounset  # Exit on uninitalized vars
+    #       set -o pipefail # Exit on pipe exec fail
 
-          VAULT_NAME="ecl-az-fact-kvt-01-main"
+    #       VAULT_NAME="ecl-az-fact-kvt-01-main"
 
-          [ -d ~/.ssh ] || mkdir ~/.ssh
-          [ -f ~/.ssh/id_rsa ] || az keyvault secret download --name poc-prv-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa
-          [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
-          [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/id_rsa
+    #       [ -d ~/.ssh ] || mkdir ~/.ssh
+    #       [ -f ~/.ssh/id_rsa ] || az keyvault secret download --name poc-prv-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa
+    #       [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
+    #       [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
+    #       chmod 600 ~/.ssh/id_rsa
         
     - task: AzureCLI@2
       displayName: "Recreate DPLT Jenkins Agent" 

@@ -66,7 +66,7 @@ stages:
           cd $(System.DefaultWorkingDirectory)/.git/
           ls -lrtha
 
-          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
+          cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
           echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"

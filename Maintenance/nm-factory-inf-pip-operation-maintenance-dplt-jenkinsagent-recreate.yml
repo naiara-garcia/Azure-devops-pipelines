@@ -63,5 +63,5 @@ stages:
           cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
-          echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"
-          terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent
+          echo "terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"
+          terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent

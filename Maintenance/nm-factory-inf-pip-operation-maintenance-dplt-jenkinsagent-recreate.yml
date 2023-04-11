@@ -42,7 +42,6 @@ stages:
         terraformVersion: 1.3.0
 
     - checkout: nm-factory-inf-env-pro
-      path: nm-factory-inf-env-pro
         
     - task: AzureCLI@2
       displayName: "Recreate DPLT Jenkins Agent" 
@@ -61,7 +60,7 @@ stages:
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
 
-          cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-dplt
+          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
           echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"

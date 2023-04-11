@@ -16,7 +16,7 @@ parameters:
   default: Deprovision
   values:
     - Deprovision
-    - Delete   
+#    - Delete   
 
 - name: oktaDomain
   displayName: Okta Domain
@@ -71,12 +71,13 @@ stages:
               if [[ ${{parameters.action}} == "Deprovision" ]];then
                 echo "User already DEPROVISIONED. No more action required."
               else
-                echo "Deleting user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
-                curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
-                -H "Accept: application/json" \
-                -H "Content-Type: application/json" \
-                -H "Authorization: SSWS ${OKTA_TOKEN}" \
-                "https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=false" | jq
+                echo "Deleting users is disabled."
+                #echo "Deleting user ${{parameters.email}} with id $(jq ".id" resp_get.json)"
+                #curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
+                #-H "Accept: application/json" \
+                #-H "Content-Type: application/json" \
+                #-H "Authorization: SSWS ${OKTA_TOKEN}" \
+                #"https://${{parameters.oktaDomain}}/api/v1/users/${user_id}?sendEmail=false" | jq
               fi
           fi
       env:

@@ -43,7 +43,7 @@ stages:
 
     - checkout: nm-factory-inf-env-pro
       path: nm-factory-inf-env-pro
-      persistCredentials: true
+      persistCredentials: false
 
     # - script: |
     #     echo "Cloning Terraform repository"

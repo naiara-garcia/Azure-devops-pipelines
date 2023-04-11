@@ -89,7 +89,7 @@ stages:
           set -o errexit  # Exit on error
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
-          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
+          cd $(System.DefaultWorkingDirectory)/.git/nm-factory-inf-env-pro/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
           echo "terraform plan --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"

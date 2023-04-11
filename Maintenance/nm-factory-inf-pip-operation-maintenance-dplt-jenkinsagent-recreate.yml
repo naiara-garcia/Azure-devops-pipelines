@@ -13,10 +13,6 @@ schedules:
     - main
   always: true
 
-variables:
-- name: TF_REPOSITORY
-  value: "https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-pro"
-
 resources:
   repositories:
   - repository: nm-factory-inf-env-pro

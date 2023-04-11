@@ -60,6 +60,12 @@ stages:
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
 
+          cd $(System.DefaultWorkingDirectory)
+          ls -lrtha
+
+          cd $(System.DefaultWorkingDirectory)/.git/
+          ls -lrtha
+
           cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init

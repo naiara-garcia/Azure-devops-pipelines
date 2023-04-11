@@ -13,18 +13,11 @@ schedules:
     - main
   always: true
 
-variables:
-- name: TF_REPOSITORY
-  value: "https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/ecl-ado-prj-iac/_git/nm-factory-inf-env-pro"
-
 resources:
   repositories:
   - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
-  - repository: nm-factory-inf-mod-naming
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-mod-naming
 
 stages:
 - stage: recreate_jenkins_agent_vm 
@@ -44,35 +37,7 @@ stages:
       inputs:
         terraformVersion: 1.3.0
 
-    - script: |
-        echo "Cloning Terraform repository"
-        echo "az config"
-        az config set extension.use_dynamic_install=yes_without_prompt
-        echo "Executing ... az devops login"
-        echo $(System.AccessToken) | az devops login
-        git clone -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" ${TF_REPOSITORY}
-      displayName: "Clone Terraform repository"
-    
-    - task: AzureCLI@2
-      displayName: "Install SSH keys"
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash
-
-          set -o errexit  # Exit on error
-          set -o nounset  # Exit on uninitalized vars
-          set -o pipefail # Exit on pipe exec fail
-
-          VAULT_NAME="ecl-az-fact-kvt-01-main"
-
-          [ -d ~/.ssh ] || mkdir ~/.ssh
-          [ -f ~/.ssh/id_rsa ] || az keyvault secret download --name poc-prv-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa
-          [ -f ~/.ssh/id_rsa.pub ] || az keyvault secret download --name poc-pub-key --vault-name ${VAULT_NAME} --file ~/.ssh/id_rsa.pub
-          [ -f ~/.ssh/known_hosts ] || az keyvault secret download --name poc-keyscan --vault-name ${VAULT_NAME} --file ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/id_rsa
+    - checkout: nm-factory-inf-env-pro
         
     - task: AzureCLI@2
       displayName: "Recreate DPLT Jenkins Agent" 
@@ -90,7 +55,8 @@ stages:
           set -o errexit  # Exit on error
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
-          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-dplt
+
+          cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-dplt
           echo "terraform init"
           terraform init
           echo "terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"

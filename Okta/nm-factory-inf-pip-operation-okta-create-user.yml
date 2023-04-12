@@ -1,0 +1,70 @@
+name: nm-factory-inf-pip-operation-okta-create-user
+
+trigger: none # will disable CI builds entirely
+ 
+pool:
+  name: Factory-VSS-Agents
+
+parameters:
+- name: firstName
+  displayName: First Name
+  type: string
+
+- name: lastName
+  displayName: Last Name
+  type: string
+
+- name: email
+  displayName: Email
+  type: string
+
+- name: oktaDomain
+  displayName: Okta Domain
+  type: string
+  default: "iam-nm-dev-dplt-admin.okta.com"
+
+stages:
+- stage: create_okta_user
+  jobs:
+  - job: create_okta_user
+    steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-fact-kvt-01-main'
+        SecretsFilter: 'okta-token'
+        RunAsPreJob: true
+
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        failOnStderr: true
+        script: |
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -d '{
+            "profile": {
+              "firstName": "'"${{parameters.firstName}}"'",
+              "lastName": "'"${{parameters.lastName}}"'",
+              "email": "'"${{parameters.email}}"'",
+              "login": "'"${{parameters.email}}"'"
+            }
+          }' "https://${{parameters.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+
+          cat resp.json
+          http_code=$(jq .http_code resp.json | tr -d '"') 
+
+          if [[ $http_code -ge 400 ]]; then
+            echo "Operation Failed"
+            exit -1
+          else
+            echo "Operation Successfull"
+            exit 0
+          fi
+      env:
+        OKTA_TOKEN: $(okta-token)
+
+

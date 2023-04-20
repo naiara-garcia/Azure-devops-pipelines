@@ -1,0 +1,7 @@
+## Terraform .gitignore
+**/*.tfstate
+**/*.hcl
+**/.terraform/**
+**/*.lock*x:
+
+jenkins_agent_dplt_key*

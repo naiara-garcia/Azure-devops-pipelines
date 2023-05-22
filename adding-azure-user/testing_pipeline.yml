@@ -134,11 +134,15 @@ jobs:
         ;;
       esac
 
-      echo "Commit and push new branch to remote repository"
+      echo "Configure user for the push action"
       git config --global user.email "naiaragarcia@paradigmadigital.com"
       git config --global user.name "Naiara Garcia"
+
+      echo "Commit new branch to remote repository"
       git add *
       git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+      echo "Push the new branch to remote repository"
       B64_PAT=$(printf ":$(System.AccessToken)" | base64)
       git -c http.extraHeader="Authorization: Basic ${B64_PAT}" push origin $BRANCHTARGET
     displayName: "Clone repository to modify and push new branch"

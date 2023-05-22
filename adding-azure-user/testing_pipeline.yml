@@ -138,7 +138,7 @@ jobs:
       git add *
       git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
       B64_PAT=$(printf ":$(System.AccessToken)" | base64)
-      git push -c http.extraHeader="Authorization: Basic ${B64_PAT}" push origin $BRANCHTARGET
+      git -c http.extraHeader="Authorization: Basic ${B64_PAT}" push origin $BRANCHTARGET
     displayName: "Clone repository to modify and push new branch"
 
   - script: |

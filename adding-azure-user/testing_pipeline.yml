@@ -49,10 +49,6 @@ jobs:
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
 
   steps:
-#  - checkout: self
-#    persistCredentials: true
-#  - checkout: self
-#    clean: true
   - script: |
       echo "Download the repository"
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$REPONAME

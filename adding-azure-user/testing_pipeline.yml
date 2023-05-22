@@ -135,6 +135,8 @@ jobs:
       esac
 
       echo "Commit and push new branch to remote repository"
+      git config --global user.email "naiaragarcia@paradigmadigital.com"
+      git config --global user.name "Naiara Garcia"
       git add *
       git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
       B64_PAT=$(printf ":$(System.AccessToken)" | base64)

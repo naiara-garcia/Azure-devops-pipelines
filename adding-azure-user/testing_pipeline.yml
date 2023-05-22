@@ -51,7 +51,6 @@ jobs:
   steps:
   - script: |
       echo "Download the repository"
-      git config --global user.email "naiaragarcia@paradigmadigital.com"
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$REPONAME
 
       echo "Create a new branch locally"

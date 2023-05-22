@@ -59,7 +59,7 @@ jobs:
       git checkout -b $BRANCHTARGET
 
       echo "Added a new line to terraform.tfvars file"
-      case ${{ parameters.option }}
+      case ${{ parameters.option }} in
         dpro_developer)
           echo "Check that user is not currently at the group dpro_developer"
           mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`

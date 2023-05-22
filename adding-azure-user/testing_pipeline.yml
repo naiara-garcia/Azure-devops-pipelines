@@ -134,10 +134,6 @@ jobs:
         ;;
       esac
 
-#      echo "Configure user for the push action"
-#      git config --global user.email "naiaragarcia@paradigmadigital.com"
-#      git config --global user.name "Naiara Garcia"
-
       echo "Commit new branch to remote repository"
       git add *
       git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"

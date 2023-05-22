@@ -135,9 +135,7 @@ jobs:
       git add *
       git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
-
     displayName: "Clone repository to modify and push new branch"
-
 
   - script: |
       echo "Create needed variables"
@@ -159,5 +157,4 @@ jobs:
           az repos pr create -r $REPONAME -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket $3"   
         fi
       fi
-
     displayName: "Pull Request creation"

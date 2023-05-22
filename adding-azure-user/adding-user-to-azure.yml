@@ -1,0 +1,215 @@
+name: adding-user-to-azure
+
+trigger: none # will disable CI builds entirely
+
+pool:
+  name: Factory-VSS-Agents
+
+parameters:
+- name: mail
+  displayName: User Email
+  type: string
+- name: option
+  displayName: Group Option
+  type: string
+  values: 
+  - dpro_developer
+  - dplt_pipeline
+  - dplt_developer
+  - infra_admin
+  - remove_user
+- name: branch
+  displayName: Ticket Number
+  type: string
+
+jobs:
+- job:
+  variables:
+  - name: BRANCHTARGET
+    value: "feature/${{ parameters.branch }}"
+  - name: BRANCHSOURCE
+    value: "refs/heads/main"
+  - name: ORGANIZATION
+    value: "https://dev.azure.com/ecl-ado-factory/"
+  - name: AZUREREPO
+    value: "nm-factory-inf-env-pro"
+  - name: AZUREDEVOPSREPO
+    value: "nm-factory-inf-env-azdevops"
+  - name: ORGURL
+    value: "https://dev.azure.com/ecl-ado-factory"
+  - name: PROJECT
+    value: "ecl-ado-prj-iac"
+  - name: URL
+    value: "$ORGURL/$PROJECT"
+  - name: AZUREURIBRANCHSTATUS
+    value: "$URL/_apis/git/repositories/$AZUREREPO/stats/branches?name=$BRANCHTARGET"
+  - name: AZUREURICHECKACTIVEPR
+    value: "$URL/_apis/git/repositories/$AZUREREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"       
+  - name: AZUREDEVURIBRANCHSTATUS
+    value: "$URL/_apis/git/repositories/$AZUREDEVOPSREPO/stats/branches?name=$BRANCHTARGET"
+  - name: AZUREDEVURICHECKACTIVEPR
+    value: "$URL/_apis/git/repositories/$AZUREDEVOPSREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"               
+  - name: REVIEWERS
+    value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
+
+  steps:
+  - script: |
+      echo "Download the repository $AZUREREPO"
+      git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
+
+      echo "Create a new branch locally for $AZUREREPO repository"
+      cd $AZUREREPO/004-aad
+      git checkout -b $BRANCHTARGET
+
+      echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
+      case ${{ parameters.option }} in
+        dpro_developer)
+          echo "Check that user is not currently at the group dpro_developer"
+          mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to dpro_developer group"
+            sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi
+          echo "User added to dpro_developer group"
+        ;;
+        dplt_pipeline)
+          echo "Check that user is not currently at the dplt_pipeline Azure Group"
+          mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to dplt_pipeline Azure Group"
+            sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi   
+          echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
+          mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to dplt_pipeline Azure Devops Group"
+            sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi        
+          echo "User added to dplt_pipeline groups"
+        ;;
+        dplt_developer)
+          echo "Check that user is not currently at the group dplt_developer"
+          mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to dplt_developer Azure Devops Group"
+            sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi     
+          echo "User added to dplt_developer group"
+        ;;
+        infra_admin)
+          echo "Check that user is not currently at the group infra_dev_owners"
+          mail=`sed -n '/^group_infra_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to infra_dev_owners group"
+            sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi     
+          echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
+          mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to azdevops_dplt_admin_owners group"
+            sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi       
+          echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
+          mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+          if [[ -z "$mail" ]] 
+          then 
+            echo "Adding new user to azdevops_dpro_admin_owners group"
+            sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+          fi       
+          echo "User added to infra_admin groups"
+        ;;
+        remove_user)
+          echo "Remove user from all groups"
+          sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+          echo "User removed from all groups"
+        ;;
+        *)
+          echo "Bad option"
+        ;;
+      esac
+
+      echo "Commit new branch to remote repository $AZUREREPO"
+      git add *
+      git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+      echo "Push the new branch to remote repository $AZUREREPO"
+      git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+    displayName: "Clone repository to modify and push new branch"
+
+  - script: |
+      echo "Create needed variables for the PR at $AZUREREPO repository"
+      STATUS=`curl -u :$MY_PAT $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
+      ACTIVEPR=`curl -u :$MY_PAT $AZUREURICHECKACTIVEPR | jq -r .count`
+
+      echo "Login to az devops to allow PR creation"
+      echo $(System.AccessToken) | az devops login
+
+      echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREREPO repository"
+      if [[ $STATUS == '0' ]]
+      then
+        echo "Current branch contains last changes from main in $AZUREREPO repository"
+      else
+        if [[ $ACTIVEPR > '0' ]]
+        then
+          echo "PR exists already at $AZUREREPO repository"
+        else
+          az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket $3"   
+        fi
+      fi
+    displayName: "Pull Request creation for $AZUREREPO repository"
+
+  steps:
+  - script: |
+      if [[ ${{ parameters.option }} == dplt_pipeline ]]
+      then
+        echo "Download the $AZUREDEVOPSREPO repository"
+        git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
+
+        echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
+        cd $AZUREDEVOPSREPO
+        git checkout -b $BRANCHTARGET
+
+        echo "Added a new line to terraform.tfvars file at $AZUREDEVOPSREPO repository"
+        echo "Check that user is not currently at the group all_users"
+        mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+        if [[ -z "$mail" ]] 
+        then 
+          echo "Adding new user to all_users group"
+          sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+        fi
+        echo "User added to all_users group"
+
+        echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
+        git add *
+        git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+        echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
+        git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+
+        echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
+        STATUS=`curl -u :$MY_PAT $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
+        ACTIVEPR=`curl -u :$MY_PAT $AZUREDEVURICHECKACTIVEPR | jq -r .count`
+
+        echo "Login to az devops to allow PR creation"
+        echo $(System.AccessToken) | az devops login
+
+        echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
+        if [[ $STATUS == '0' ]]
+        then
+          echo "Current branch contains last changes from main in $AZUREDEVOPSREPO repository"
+        else
+          if [[ $ACTIVEPR > '0' ]]
+          then
+            echo "PR exists already at $AZUREDEVOPSREPO repository"
+          else
+            az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket $3"   
+          fi
+        fi
+      fi
+    displayName: "Added user license for Azure Devops"

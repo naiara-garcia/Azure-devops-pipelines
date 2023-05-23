@@ -39,16 +39,14 @@ jobs:
     value: "https://dev.azure.com/ecl-ado-factory"
   - name: PROJECT
     value: "ecl-ado-prj-iac"
-  - name: URL
-    value: "$ORGURL/$PROJECT"
   - name: AZUREURIBRANCHSTATUS
-    value: "$URL/_apis/git/repositories/$AZUREREPO/stats/branches?name=$BRANCHTARGET"
+    value: "$ORGURL/$PROJECT/_apis/git/repositories/$AZUREREPO/stats/branches?name=$BRANCHTARGET"
   - name: AZUREURICHECKACTIVEPR
-    value: "$URL/_apis/git/repositories/$AZUREREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"       
+    value: "$ORGURL/$PROJECT/_apis/git/repositories/$AZUREREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"       
   - name: AZUREDEVURIBRANCHSTATUS
-    value: "$URL/_apis/git/repositories/$AZUREDEVOPSREPO/stats/branches?name=$BRANCHTARGET"
+    value: "$ORGURL/$PROJECT/_apis/git/repositories/$AZUREDEVOPSREPO/stats/branches?name=$BRANCHTARGET"
   - name: AZUREDEVURICHECKACTIVEPR
-    value: "$URL/_apis/git/repositories/$AZUREDEVOPSREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"               
+    value: "$ORGURL/$PROJECT/_apis/git/repositories/$AZUREDEVOPSREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"               
   - name: REVIEWERS
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
 

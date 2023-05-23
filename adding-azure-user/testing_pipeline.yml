@@ -37,14 +37,10 @@ jobs:
     value: "https://dev.azure.com/ecl-ado-factory"
   - name: PROJECT
     value: "ecl-ado-prj-iac"
-  - name: URL
-    value: "$ORGURL/$PROJECT"
   - name: URIBRANCHSTATUS
-    value: "$URL/_apis/git/repositories/$REPONAME/stats/branches?name=$BRANCHTARGET"
+    value: "$ORGURL/$PROJECT/_apis/git/repositories/$REPONAME/stats/branches?name=$BRANCHTARGET"
   - name: URICHECKACTIVEPR
-    value: "$URL/_apis/git/repositories/$REPONAME/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"
-  - name: URICREATEPR
-    value: "$URL/_apis/git/repositories/$REPONAME/pullrequests?api-version=7.0"                
+    value: "$ORGURL/$PROJECT/_apis/git/repositories/$REPONAME/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"            
   - name: REVIEWERS
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
 

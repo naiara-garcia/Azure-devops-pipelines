@@ -38,9 +38,9 @@ jobs:
   - name: PROJECT
     value: "ecl-ado-prj-iac"
   - name: URIBRANCHSTATUS
-    value: "$ORGURL/$PROJECT/_apis/git/repositories/$REPONAME/stats/branches?name=$BRANCHTARGET"
+    value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.REPONAME  }}/stats/branches?name=${{ variables.BRANCHTARGET }}"
   - name: URICHECKACTIVEPR
-    value: "$ORGURL/$PROJECT/_apis/git/repositories/$REPONAME/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"            
+    value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.REPONAME  }}/pullrequests?searchCriteria.targetRefName=${{ variables.BRANCHTARGET }}&searchCriteria.sourceRefName=${{ variables.BRANCHSOURCE }}"            
   - name: REVIEWERS
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
 

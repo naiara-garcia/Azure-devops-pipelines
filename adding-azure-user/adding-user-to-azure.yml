@@ -159,7 +159,7 @@ jobs:
         then
           echo "PR exists already at $AZUREREPO repository"
         else
-          az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket $3"   
+          az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
         fi
       fi
     displayName: "Pull Request creation for $AZUREREPO repository"
@@ -207,7 +207,7 @@ jobs:
           then
             echo "PR exists already at $AZUREDEVOPSREPO repository"
           else
-            az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket $3"   
+            az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
           fi
         fi
       fi

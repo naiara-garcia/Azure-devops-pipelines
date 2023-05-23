@@ -47,7 +47,7 @@ jobs:
     value: "$URL/_apis/git/repositories/$REPONAME/pullrequests?api-version=7.0"                
   - name: REVIEWERS
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
-    
+
   steps:
   - script: |
       echo "Download the repository"
@@ -140,8 +140,8 @@ jobs:
 
   - script: |
       echo "Create needed variables"
-      STATUS=`curl -u :$MY_PAT $URIBRANCHSTATUS | jq -r .aheadCount`
-      ACTIVEPR=`curl -u :$MY_PAT $URICHECKACTIVEPR | jq -r .count`
+      STATUS=`curl -u :$(System.AccessToken) $URIBRANCHSTATUS | jq -r .aheadCount`
+      ACTIVEPR=`curl -u :$(System.AccessToken) $URICHECKACTIVEPR | jq -r .count`
 
       echo "Login to az devops to allow PR creation"
       echo $(System.AccessToken) | az devops login

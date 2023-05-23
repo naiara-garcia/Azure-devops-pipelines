@@ -144,8 +144,8 @@ jobs:
 
   - script: |
       echo "Create needed variables for the PR at $AZUREREPO repository"
-      STATUS=`curl -u :$MY_PAT $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
-      ACTIVEPR=`curl -u :$MY_PAT $AZUREURICHECKACTIVEPR | jq -r .count`
+      STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
+      ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
 
       echo "Login to az devops to allow PR creation"
       echo $(System.AccessToken) | az devops login
@@ -192,8 +192,8 @@ jobs:
         git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
         echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
-        STATUS=`curl -u :$MY_PAT $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
-        ACTIVEPR=`curl -u :$MY_PAT $AZUREDEVURICHECKACTIVEPR | jq -r .count`
+        STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
+        ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
 
         echo "Login to az devops to allow PR creation"
         echo $(System.AccessToken) | az devops login

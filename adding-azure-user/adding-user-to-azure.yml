@@ -51,6 +51,35 @@ jobs:
     value: "$URL/_apis/git/repositories/$AZUREDEVOPSREPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"               
   - name: REVIEWERS
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
+  - name: DESCRIPTION
+    value:
+    - ## What does this PR do?
+    - This PR is to add/remove users indicated at ticket ${{ parameters.branch }}
+    -
+    - ## Why is it necessary?
+    - Because the users need this access to perform his daily job.
+    -
+    - ## Pull request type
+    - - [ ] Bugfix
+    - - [ ] New feature
+    - - [X] IaC change
+    - - [ ] Add new alert
+    - - [ ] Alert modification
+    -
+    - ## Related ticket
+    - ${{ parameters.branch }}
+    - Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket.
+    -
+    - ## CI Output
+    - 
+    - N/A
+    -
+    - ## Checks
+    - 
+    - - [ ] The PR has a descriptive title
+    - - [ ] The changes section has been checked
+    - - [ ] A person has been assigned to this PR
+    - - [ ] Clear comments `<-- -->` from sections
 
   steps:
   - script: |
@@ -159,7 +188,7 @@ jobs:
         then
           echo "PR exists already at $AZUREREPO repository"
         else
-          az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+          az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description $DESCRIPTION --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
         fi
       fi
     displayName: "Pull Request creation for $AZUREREPO repository"
@@ -207,7 +236,7 @@ jobs:
           then
             echo "PR exists already at $AZUREDEVOPSREPO repository"
           else
-            az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+            az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description $DESCRIPTION --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
           fi
         fi
       fi

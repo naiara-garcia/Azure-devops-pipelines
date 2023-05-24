@@ -42,7 +42,7 @@ jobs:
   - name: AZUREURIBRANCHSTATUS
     value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREREPO }}/stats/branches?name=${{ variables.BRANCHTARGET }}"
   - name: AZUREURICHECKACTIVEPR
-    value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREREPO }}/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"       
+    value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREREPO }}/pullrequests?searchCriteria.targetRefName=${{ variables.BRANCHTARGET }}&searchCriteria.sourceRefName=${{ variables.BRANCHSOURCE }}"       
   - name: AZUREDEVURIBRANCHSTATUS
     value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREDEVOPSREPO }}/stats/branches?name=${{ variables.BRANCHTARGET }}"
   - name: AZUREDEVURICHECKACTIVEPR
@@ -192,7 +192,7 @@ jobs:
             echo "Bad option"
           ;;
         esac
-        
+
         echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
         git add *
         git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"

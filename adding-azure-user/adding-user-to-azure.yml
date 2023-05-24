@@ -51,6 +51,11 @@ jobs:
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
 
   steps:
+  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+    displayName: 'Install Terraform 1.3.0'
+    inputs:
+      terraformVersion: 1.3.0
+
   - script: |
       echo "Download the repository $AZUREREPO"
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
@@ -136,9 +141,20 @@ jobs:
       git add *
       git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
+      echo "Login to az devops"
+      echo $(System.AccessToken) | az devops login
+
+      echo "Launching terraform commands to apply changes"
+      terraform init
+      terraform plan
+
       echo "Push the new branch to remote repository $AZUREREPO"
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
     displayName: "Clone repository to modify and push new branch"
+    env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"
 
   - script: |
       echo "Create needed variables for the PR at $AZUREREPO repository"
@@ -197,15 +213,19 @@ jobs:
         git add *
         git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
+        echo "Login to az devops"
+        echo $(System.AccessToken) | az devops login
+
+        echo "Launching terraform commands to apply changes"
+        terraform init
+        terraform plan
+
         echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
         git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
         echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
         STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
         ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
-
-        echo "Login to az devops to allow PR creation"
-        echo $(System.AccessToken) | az devops login
 
         echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
         if [[ $STATUS == '0' ]]
@@ -221,3 +241,7 @@ jobs:
         fi
       fi
     displayName: "Added user license for Azure Devops"
+    env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"

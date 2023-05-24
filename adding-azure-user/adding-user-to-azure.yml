@@ -148,7 +148,7 @@ jobs:
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
     displayName: "Clone repository to modify and push new branch"
 
-  - task: ms-devlabs.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+  - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
     displayName: 'Run terraform init'
     inputs:
       command: init
@@ -158,7 +158,7 @@ jobs:
         ARM_CLIENT_SECRET: $(terraform-app-secret)
         ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"
 
-  - task: ms-devlabs.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+  - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
     displayName: 'Run terraform init'
     inputs:
       command: validate

@@ -62,8 +62,8 @@ jobs:
           then 
             echo "Adding new user to dpro_developer group"
             sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+            echo "User added to dpro_developer group"
           fi
-          echo "User added to dpro_developer group"
         ;;
         dplt_pipeline)
           echo "Check that user is not currently at the dplt_pipeline Azure Group"
@@ -79,8 +79,8 @@ jobs:
           then 
             echo "Adding new user to dplt_pipeline Azure Devops Group"
             sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+            echo "User added to dplt_pipeline groups"
           fi        
-          echo "User added to dplt_pipeline groups"
         ;;
         dplt_developer)
           echo "Check that user is not currently at the group dplt_developer"
@@ -89,8 +89,8 @@ jobs:
           then 
             echo "Adding new user to dplt_developer Azure Devops Group"
             sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+            echo "User added to dplt_developer group"
           fi     
-          echo "User added to dplt_developer group"
         ;;
         infra_admin)
           echo "Check that user is not currently at the group infra_dev_owners"
@@ -113,8 +113,8 @@ jobs:
           then 
             echo "Adding new user to azdevops_dpro_admin_owners group"
             sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+            echo "User added to infra_admin groups"
           fi       
-          echo "User added to infra_admin groups"
         ;;
         remove_user)
           echo "Remove user from all groups"

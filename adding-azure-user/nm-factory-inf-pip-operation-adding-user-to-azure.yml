@@ -177,3 +177,113 @@ stages:
           echo "Launched terraform commands"
           terraform init
           terraform validate
+
+    - task: AzureCLI@2
+      displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Create needed variables for the PR at $AZUREREPO repository"
+          STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
+          ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
+
+          echo "Login to az devops to allow PR creation"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREREPO repository"
+          if [[ $STATUS == '0' ]]
+          then
+            echo "Current branch contains last changes from main in $AZUREREPO repository"
+          else
+            if [[ $ACTIVEPR > '0' ]]
+            then
+              echo "PR exists already at $AZUREREPO repository"
+            else
+              az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+            fi
+          fi      
+
+    - task: AzureCLI@2
+      displayName: "Added user license for Azure Devops" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash   
+
+          if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == remove_user ]]
+          then
+            echo "Download the $AZUREDEVOPSREPO repository"
+            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
+
+            echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
+            cd $AZUREDEVOPSREPO
+            git checkout -b $BRANCHTARGET
+
+            case ${{ parameters.option }} in
+              dplt_pipeline)
+                echo "Check that user is not currently at the group all_users"
+                mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to all_users group"
+                  sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to all_users group"
+                fi
+              ;;
+              remove_user)
+                echo "Remove user from all groups"
+                sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+                echo "User removed from all groups"
+              ;;
+              *)
+                echo "Bad option"
+              ;;
+            esac
+
+            echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
+            git add *
+            git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+            echo "Login to az devops"
+            echo $(System.AccessToken) | az devops login
+
+            echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
+            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+
+            echo "Launched terraform commands"
+            echo "terraform init"
+            terraform init
+            echo "terraform validate"
+            terraform validate
+
+            echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
+            STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
+            ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
+
+            echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
+            if [[ $STATUS == '0' ]]
+            then
+              echo "Current branch contains last changes from main in $AZUREDEVOPSREPO repository"
+            else
+              if [[ $ACTIVEPR > '0' ]]
+              then
+                echo "PR exists already at $AZUREDEVOPSREPO repository"
+              else
+                az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+              fi
+            fi
+          fi        

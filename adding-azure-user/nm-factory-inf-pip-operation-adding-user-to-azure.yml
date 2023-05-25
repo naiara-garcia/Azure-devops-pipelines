@@ -177,8 +177,8 @@ stages:
           echo "Launched terraform commands"
           echo "terraform init"
           terraform init
-          echo "terraform validate"
-          terraform validate
+          echo "terraform apply"
+          terraform apply -auto-approve
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
@@ -199,6 +199,7 @@ stages:
 
           echo "Install Azure Devops extension"
           az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name azure-devops
 
           echo "Login to az devops to allow PR creation"
           echo $(System.AccessToken) | az devops login
@@ -272,8 +273,8 @@ stages:
             echo "Launched terraform commands"
             echo "terraform init"
             terraform init
-            echo "terraform validate"
-            terraform validate
+            echo "terraform apply"
+            terraform apply -auto-approve
 
             echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
             STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`

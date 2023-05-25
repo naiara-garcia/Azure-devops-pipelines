@@ -29,7 +29,7 @@ parameters:
   type: string
 
 stages:
-- stage: adding or removing user from Azure groups 
+- stage: Adding_or_removing_user_from_Azure_groups 
   jobs:
   - job: add_user_to_azure
     variables:

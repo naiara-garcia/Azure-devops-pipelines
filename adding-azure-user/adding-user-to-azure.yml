@@ -151,14 +151,14 @@ jobs:
     inputs:
       provider: 'azurerm'
       command: 'init'
-      workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
+      workingDirectory: '/${{ variables.AZUREREPO }}/004-aad'
       backendServiceArm: 'ecl-az-fact-svc-01-armconnection'
 
   - task: TerraformTaskV4@4
     inputs:
       provider: 'azurerm'
       command: 'validate'
-      workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
+      workingDirectory: '/${{ variables.AZUREREPO }}/004-aad'
 
   - script: |
       echo "Create needed variables for the PR at $AZUREREPO repository"

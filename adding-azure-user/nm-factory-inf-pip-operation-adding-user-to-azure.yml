@@ -175,7 +175,9 @@ stages:
           git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
           echo "Launched terraform commands"
+          echo "terraform init"
           terraform init
+          echo "terraform validate"
           terraform validate
 
     - task: AzureCLI@2
@@ -194,6 +196,9 @@ stages:
           echo "Create needed variables for the PR at $AZUREREPO repository"
           STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
           ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
+
+          echo "Install Azure Devops extension"
+          az config set extension.use_dynamic_install=yes_without_prompt
 
           echo "Login to az devops to allow PR creation"
           echo $(System.AccessToken) | az devops login

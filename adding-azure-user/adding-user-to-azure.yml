@@ -51,10 +51,9 @@ jobs:
     value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
 
   steps:
-  - task: TerraformInstaller@0
-    displayName: 'Install Terraform 1.3.0'
+  - task: TerraformInstaller@1
     inputs:
-      terraformVersion: 1.3.0
+      terraformVersion: '1.3.0'
 
   - script: |
       echo "Download the repository $AZUREREPO"
@@ -148,27 +147,18 @@ jobs:
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
     displayName: "Clone repository to modify and push new branch"
 
-  - task: TerraformCLI@0
-    displayName: 'Run terraform init'
-    inputs:
-      command: init
-      runAzLogin: true
-      workingDirectory: ${{ variables.AZUREREPO }}/004-aad
-    env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
+    backendServiceArm: 'ecl-az-fact-svc-01-armconnection'
 
-  - task: TerraformCLI@0
-    displayName: 'Run terraform init'
-    inputs:
-      command: validate
-      runAzLogin: true
-      workingDirectory: ${{ variables.AZUREREPO }}/004-aad
-    env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
+    workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
 
   - script: |
       echo "Create needed variables for the PR at $AZUREREPO repository"

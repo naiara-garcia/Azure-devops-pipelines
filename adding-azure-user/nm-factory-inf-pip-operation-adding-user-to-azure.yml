@@ -171,9 +171,9 @@ stages:
           git add *
           git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
+          echo "Push the new branch to remote repository $AZUREREPO"
+          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+
           echo "Launched terraform commands"
           terraform init
           terraform validate
-
-          echo "Push the new branch to remote repository $AZUREREPO"
-          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET

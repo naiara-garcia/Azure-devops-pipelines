@@ -1,0 +1,179 @@
+name: nm-factory-inf-pip-operation-adding-user-to-azure
+
+trigger: none # will disable CI builds entirely
+ 
+pool:
+  name: Factory-VSS-Agents
+
+resources:
+  repositories:
+  - repository: nm-factory-inf-env-pro
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+
+parameters:
+- name: mail
+  displayName: User Email
+  type: string
+- name: option
+  displayName: Group Option
+  type: string
+  values: 
+  - dpro_developer
+  - dplt_pipeline
+  - dplt_developer
+  - infra_admin
+  - remove_user
+- name: branch
+  displayName: Ticket Number
+  type: string
+
+stages:
+- stage: adding or removing user from Azure groups 
+  jobs:
+  - job: add_user_to_azure
+    variables:
+    - name: BRANCHTARGET
+      value: "feature/${{ parameters.branch }}"
+    - name: BRANCHSOURCE
+      value: "refs/heads/main"
+    - name: ORGANIZATION
+      value: "https://dev.azure.com/ecl-ado-factory/"
+    - name: AZUREREPO
+      value: "nm-factory-inf-env-pro"
+    - name: AZUREDEVOPSREPO
+      value: "nm-factory-inf-env-azdevops"
+    - name: ORGURL
+      value: "https://dev.azure.com/ecl-ado-factory"
+    - name: PROJECT
+      value: "ecl-ado-prj-iac"
+    - name: AZUREURIBRANCHSTATUS
+      value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREREPO }}/stats/branches?name=${{ variables.BRANCHTARGET }}"
+    - name: AZUREURICHECKACTIVEPR
+      value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREREPO }}/pullrequests?searchCriteria.targetRefName=${{ variables.BRANCHTARGET }}&searchCriteria.sourceRefName=${{ variables.BRANCHSOURCE }}"       
+    - name: AZUREDEVURIBRANCHSTATUS
+      value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREDEVOPSREPO }}/stats/branches?name=${{ variables.BRANCHTARGET }}"
+    - name: AZUREDEVURICHECKACTIVEPR
+      value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREDEVOPSREPO }}/pullrequests?searchCriteria.targetRefName=${{ variables.BRANCHTARGET }}&searchCriteria.sourceRefName=${{ variables.BRANCHSOURCE }}"               
+    - name: REVIEWERS
+      value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
+
+    steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-seed-kvt-01-tfkv'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-seed-kvt-01-tfkv'
+        SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
+        RunAsPreJob: true
+
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+      displayName: 'Install Terraform 1.3.0'
+      inputs:
+        terraformVersion: 1.3.0
+
+    - checkout: nm-factory-inf-env-pro
+        
+    - task: AzureCLI@2
+      displayName: "Clone repository to modify and push new branch" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+
+          echo "Download the repository $AZUREREPO"
+          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
+
+          echo "Create a new branch locally for $AZUREREPO repository"
+          cd $AZUREREPO/004-aad
+          git checkout -b $BRANCHTARGET
+
+          echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
+          case ${{ parameters.option }} in
+            dpro_developer)
+              echo "Check that user is not currently at the group dpro_developer"
+              mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to dpro_developer group"
+                sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                echo "User added to dpro_developer group"
+              fi
+            ;;
+            dplt_pipeline)
+              echo "Check that user is not currently at the dplt_pipeline Azure Group"
+              mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to dplt_pipeline Azure Group"
+                sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+              fi   
+              echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
+              mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to dplt_pipeline Azure Devops Group"
+                sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                echo "User added to dplt_pipeline groups"
+              fi        
+            ;;
+            dplt_developer)
+              echo "Check that user is not currently at the group dplt_developer"
+              mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to dplt_developer Azure Devops Group"
+                sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                echo "User added to dplt_developer group"
+              fi     
+            ;;
+            infra_admin)
+              echo "Check that user is not currently at the group infra_dev_owners"
+              mail=`sed -n '/^group_infra_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to infra_dev_owners group"
+                sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+              fi     
+              echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
+              mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to azdevops_dplt_admin_owners group"
+                sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+              fi       
+              echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
+              mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to azdevops_dpro_admin_owners group"
+                sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                echo "User added to infra_admin groups"
+              fi       
+            ;;
+            remove_user)
+              echo "Remove user from all groups"
+              sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+              echo "User removed from all groups"
+            ;;
+            *)
+              echo "Bad option"
+            ;;
+          esac
+
+          echo "Commit new branch to remote repository $AZUREREPO"
+          git add *
+          git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+          echo "Launched terraform commands"
+          terraform init
+          terraform validate
+
+          echo "Push the new branch to remote repository $AZUREREPO"
+          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET

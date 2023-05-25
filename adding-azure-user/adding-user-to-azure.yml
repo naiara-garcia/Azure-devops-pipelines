@@ -147,18 +147,18 @@ jobs:
       git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
     displayName: "Clone repository to modify and push new branch"
 
-- task: TerraformTaskV4@4
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
-    backendServiceArm: 'ecl-az-fact-svc-01-armconnection'
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
+      backendServiceArm: 'ecl-az-fact-svc-01-armconnection'
 
-- task: TerraformTaskV4@4
-  inputs:
-    provider: 'azurerm'
-    command: 'validate'
-    workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'validate'
+      workingDirectory: '/${{ parameters.AZUREREPO }}/004-aad'
 
   - script: |
       echo "Create needed variables for the PR at $AZUREREPO repository"

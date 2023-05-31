@@ -37,8 +37,6 @@ stages:
       value: "feature/${{ parameters.branch }}"
     - name: BRANCHSOURCE
       value: "refs/heads/main"
-    - name: ORGANIZATION
-      value: "https://dev.azure.com/ecl-ado-factory/"
     - name: AZUREREPO
       value: "nm-factory-inf-env-pro"
     - name: AZUREDEVOPSREPO

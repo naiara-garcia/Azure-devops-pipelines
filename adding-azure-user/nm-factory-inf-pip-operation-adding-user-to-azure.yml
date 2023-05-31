@@ -54,7 +54,7 @@ stages:
     - name: AZUREDEVURICHECKACTIVEPR
       value: "${{ variables.ORGURL }}/${{ variables.PROJECT }}/_apis/git/repositories/${{ variables.AZUREDEVOPSREPO }}/pullrequests?searchCriteria.targetRefName=${{ variables.BRANCHTARGET }}&searchCriteria.sourceRefName=${{ variables.BRANCHSOURCE }}"               
     - name: REVIEWERS
-      value: "naiaragarcia@paradigmadigital.com adrianmartin@paradigmadigital.com fgiuliano@paradigmadigital.com hgomez@paradigmadigital.com jespinosa@paradigmadigital.com jhernantes@paradigmadigital.com kcardena@paradigmadigital.com madiaz@paradigmadigital.com"
+      value: ecl-ado-notification-team
 
     steps:
     - task: AzureKeyVault@2

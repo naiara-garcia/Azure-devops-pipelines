@@ -216,6 +216,32 @@ stages:
           fi      
 
     - task: AzureCLI@2
+      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Install Azure Devops extension"
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name azure-devops
+
+          echo "Login to az devops to allow PR creation"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Get the PR ID to perform the merge action"
+          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
+
+          echo "Merging the PR with main"
+          az repos pr update --org $ORGURL --id $PRID --status completed
+
+    - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
@@ -291,3 +317,29 @@ stages:
               fi
             fi
           fi        
+
+    - task: AzureCLI@2
+      displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Install Azure Devops extension"
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name azure-devops
+
+          echo "Login to az devops to allow PR creation"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Get the PR ID to perform the merge action"
+          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREDEVOPSREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
+
+          echo "Merging the PR with main"
+          az repos pr update --org $ORGURL --id $PRID --status completed

@@ -172,5 +172,8 @@ jobs:
         echo "Get the PR ID to perform the merge action"
         PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $REPONAME -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
 
+        echo "Login to az devops to allow PR creation"
+        echo $(System.AccessToken) | az devops login
+
         echo "Merging the PR with main"
         az repos pr update --org $ORGURL --id $PRID --status completed

@@ -169,15 +169,15 @@ jobs:
       inlineScript: |
         #!/bin/bash    
 
-        echo "Get the PR ID to perform the merge action"
-        PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $REPONAME -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
-
         echo "Install Azure Devops extension"
         az config set extension.use_dynamic_install=yes_without_prompt
         az extension add --name azure-devops
 
         echo "Login to az devops to allow PR creation"
         echo $(System.AccessToken) | az devops login
+
+        echo "Get the PR ID to perform the merge action"
+        PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $REPONAME -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
 
         echo "Merging the PR with main"
         az repos pr update --org $ORGURL --id $PRID --status completed

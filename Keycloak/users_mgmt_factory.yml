@@ -1,0 +1,34 @@
+trigger: none
+pr: none
+
+
+variables:
+- group: factory-keycloak-user-mgmt
+
+parameters:
+- name: mail
+  displayName: User Email
+  type: string
+- name: option
+  displayName: Group Option
+  type: string
+  values: 
+  - dpro_developer
+  - dplt_pipeline
+  - dplt_developer
+  - infra_admin
+  - remove_user
+
+jobs:
+- job: ManageUsers
+  workspace:
+    clean: all
+  pool:
+    name: Factory-VSS-Agents
+  steps:
+  - script: |
+      chmod +x ./keycloak-user-mgmt-factory.sh
+
+      docker run --entrypoint `pwd`/keycloak-user-mgmt-factory.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ parameters.mail}} ${{ parameters.option}} $(password)
+
+      echo "Execution finished"

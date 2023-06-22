@@ -240,6 +240,8 @@ stages:
 
           if [[ -z "$PRID" ]]
           then
+            echo "PR does not exist"
+          else
             echo "Login to az devops as naiaragarcia@paradigmadigital.com"
             echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login          
 
@@ -248,8 +250,6 @@ stages:
 
             echo "Merging the PR with main"
             az repos pr update --org $ORGURL --id $PRID --status completed
-          else
-            echo "PR does not exist"
           fi
 
     - task: AzureCLI@2
@@ -334,6 +334,8 @@ stages:
 
           if [[ -z "$PRID" ]]
           then
+            echo "PR does not exist"
+          else
             echo "Login to az devops as naiaragarcia@paradigmadigital.com"
             echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login
 
@@ -342,6 +344,4 @@ stages:
 
             echo "Merging the PR with main"
             az repos pr update --org $ORGURL --id $PRID --status completed
-          else
-            echo "PR does not exist"
           fi

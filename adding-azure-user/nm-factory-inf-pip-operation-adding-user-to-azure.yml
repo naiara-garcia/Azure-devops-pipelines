@@ -238,14 +238,19 @@ stages:
           echo "Get the PR ID to perform the merge action"
           PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
 
-          echo "Login to az devops as naiaragarcia@paradigmadigital.com"
-          echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login          
+          if [[ -z "$PRID" ]]
+          then
+            echo "Login to az devops as naiaragarcia@paradigmadigital.com"
+            echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login          
 
-          echo "Approve the PR created"
-          az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+            echo "Approve the PR created"
+            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
 
-          echo "Merging the PR with main"
-          az repos pr update --org $ORGURL --id $PRID --status completed
+            echo "Merging the PR with main"
+            az repos pr update --org $ORGURL --id $PRID --status completed
+          else
+            echo "PR does not exist"
+          fi
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
@@ -327,11 +332,16 @@ stages:
           echo "Get the PR ID to perform the merge action"
           PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREDEVOPSREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
 
-          echo "Login to az devops as naiaragarcia@paradigmadigital.com"
-          echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login
+          if [[ -z "$PRID" ]]
+          then
+            echo "Login to az devops as naiaragarcia@paradigmadigital.com"
+            echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login
 
-          echo "Approve the PR created"
-          az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+            echo "Approve the PR created"
+            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
 
-          echo "Merging the PR with main"
-          az repos pr update --org $ORGURL --id $PRID --status completed
+            echo "Merging the PR with main"
+            az repos pr update --org $ORGURL --id $PRID --status completed
+          else
+            echo "PR does not exist"
+          fi

@@ -243,7 +243,7 @@ stages:
             echo "PR does not exist"
           else
             echo "Login to az devops as naiaragarcia@paradigmadigital.com"
-            echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login          
+            echo $(mypat) | az devops login      
 
             echo "Approve the PR created"
             az repos pr set-vote --org $ORGURL --id $PRID --vote approve
@@ -337,7 +337,7 @@ stages:
             echo "PR does not exist"
           else
             echo "Login to az devops as naiaragarcia@paradigmadigital.com"
-            echo "dga2ck3ce3ts4kf7jr76gthb4vcqt7qj7mj7hokjsb4ftuau47ta" | az devops login
+            echo $(mypat) | az devops login
 
             echo "Approve the PR created"
             az repos pr set-vote --org $ORGURL --id $PRID --vote approve

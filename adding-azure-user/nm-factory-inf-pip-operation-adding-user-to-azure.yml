@@ -232,7 +232,7 @@ stages:
           #!/bin/bash    
 
           echo "Login to az devops to allow PR approvation and merged"
-          echo $(mypat) | az devops login --oragnization $ORGURL
+          echo $(mypat) | az devops login --organization $ORGURL
 
           echo "Get the PR ID to perform the merge action"
           PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`

@@ -11,6 +11,9 @@ resources:
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
 
+variables:
+- group: factory-azure-mgmt
+
 parameters:
 - name: mail
   displayName: User Email

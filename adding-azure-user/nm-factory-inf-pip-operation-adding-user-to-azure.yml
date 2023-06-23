@@ -215,6 +215,9 @@ stages:
             fi
           fi      
 
+          echo "Logout from Azure"
+          az logout
+
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
       env:
@@ -228,12 +231,8 @@ stages:
         inlineScript: |
           #!/bin/bash    
 
-          echo "Install Azure Devops extension"
-          az config set extension.use_dynamic_install=yes_without_prompt
-          az extension add --name azure-devops
-
           echo "Login to az devops to allow PR creation"
-          echo $(System.AccessToken) | az devops login
+          echo $(mypat) | az devops login
 
           echo "Get the PR ID to perform the merge action"
           PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
@@ -242,9 +241,6 @@ stages:
           then
             echo "PR does not exist"
           else
-            echo "Login to az devops as naiaragarcia@paradigmadigital.com"
-            echo $(mypat) | az devops login      
-
             echo "Approve the PR created"
             az repos pr set-vote --org $ORGURL --id $PRID --vote approve
 

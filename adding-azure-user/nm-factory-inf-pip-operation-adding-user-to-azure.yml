@@ -11,6 +11,9 @@ resources:
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
 
+variables:
+- group: factory-azure-mgmt
+
 parameters:
 - name: mail
   displayName: User Email
@@ -215,6 +218,9 @@ stages:
             fi
           fi      
 
+          echo "Logout from Azure"
+          az logout
+
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
       env:
@@ -228,18 +234,25 @@ stages:
         inlineScript: |
           #!/bin/bash    
 
-          echo "Install Azure Devops extension"
-          az config set extension.use_dynamic_install=yes_without_prompt
-          az extension add --name azure-devops
-
-          echo "Login to az devops to allow PR creation"
-          echo $(System.AccessToken) | az devops login
+          echo "Login to az devops to allow PR approvation and merged"
+          echo $(mypat) | az devops login --organization $ORGURL
 
           echo "Get the PR ID to perform the merge action"
           PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
 
-          echo "Merging the PR with main"
-          az repos pr update --org $ORGURL --id $PRID --status completed
+          if [[ -z "$PRID" ]]
+          then
+            echo "PR does not exist"
+          else
+            echo "Approve the PR created"
+            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+
+            echo "Merging the PR with main"
+            az repos pr update --org $ORGURL --id $PRID --status completed
+          fi
+
+          echo "Logout from Azure account"
+          az logout
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
@@ -321,5 +334,19 @@ stages:
           echo "Get the PR ID to perform the merge action"
           PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREDEVOPSREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
 
-          echo "Merging the PR with main"
-          az repos pr update --org $ORGURL --id $PRID --status completed
+          echo "Logout from Azure account"
+          az logout
+
+          if [[ -z "$PRID" ]]
+          then
+            echo "PR does not exist"
+          else
+            echo "Login to az devops as naiaragarcia@paradigmadigital.com"
+            echo $(mypat) | az devops login
+
+            echo "Approve the PR created"
+            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+
+            echo "Merging the PR with main"
+            az repos pr update --org $ORGURL --id $PRID --status completed
+          fi

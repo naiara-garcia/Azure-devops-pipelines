@@ -1,4 +1,4 @@
-name: nm-factory-inf-pip-operation-stop-aksdev
+name: nm-factory-inf-pip-operation-stop-akstest
 
 pool:
   name: Factory-VSS-Agents
@@ -6,22 +6,22 @@ pool:
 variables:
 - group: factory-azure-mgmt
 
-schedules:
-- cron: "30 19 * * *"
-  displayName: Stopping the AKSdev cluster
-  branches:
-    include:
-    - main
-  always: true
+#schedules:
+#- cron: "30 19 * * *"
+#  displayName: Stopping the AKStest cluster
+#  branches:
+#    include:
+#    - main
+#  always: true
 
 stage:
-- stage: Stop_AKSdev_cluster
+- stage: Stop_AKStest_cluster
   jobs:
-  - job: stop_aksdev_cluster
+  - job: stop_akstest_cluster
 
     steps:
     - task: AzureCLI@2
-      displayName: "Stop AKSdev cluster" 
+      displayName: "Stop AKStest cluster" 
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -34,5 +34,5 @@ stage:
           #!/bin/bash
           echo "Login to Azure"
           echo $(mypat) | az login
-          echo "Stop AKSdev Cluster"
+          echo "Stop AKStest Cluster"
           az aks stop --name ecl-az-fact-cls-01-akstest --resource-group tes-te-test-tes-01-test --subscription azure-euroctl-hub-subs

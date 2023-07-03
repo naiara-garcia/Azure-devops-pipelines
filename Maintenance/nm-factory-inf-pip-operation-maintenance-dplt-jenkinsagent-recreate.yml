@@ -56,8 +56,8 @@ stages:
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
 
-          cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-dplt
+          cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-vm-dplt
           echo "terraform init"
           terraform init
-          echo "terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent"
-          terraform apply -auto-approve --replace=azurerm_linux_virtual_machine_scale_set.jenkins-agent
+          echo "terraform apply -auto-approve --replace=module.virtual_machine.azurerm_linux_virtual_machine.main"
+          terraform apply -auto-approve --replace=module.virtual_machine.azurerm_linux_virtual_machine.main

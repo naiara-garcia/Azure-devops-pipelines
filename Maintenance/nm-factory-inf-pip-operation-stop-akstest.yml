@@ -14,7 +14,7 @@ variables:
 #    - main
 #  always: true
 
-stage:
+stages:
 - stage: Stop_AKStest_cluster
   jobs:
   - job: stop_akstest_cluster

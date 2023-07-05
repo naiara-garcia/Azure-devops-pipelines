@@ -32,7 +32,15 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           #!/bin/bash
-          echo "Login to Azure"
-          echo $(mypat) | az login
-          echo "Stop AKStest Cluster"
-          az aks stop --name ecl-az-fact-cls-01-akstest --resource-group tes-te-test-tes-01-test --subscription azure-euroctl-hub-subs
+
+          echo "Login as Build Service to check that the login works"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Logout from Build Service"
+          az logout
+
+          echo "Login to Azure as naiaragarcia@paradigmadigital.com to allow stooping the AKS Cluster"
+          code=`echo $(mypat) | az login`
+          echo $code
+#          echo "Stop AKStest Cluster"
+#          az aks stop --name ecl-az-fact-cls-01-akstest --resource-group tes-te-test-tes-01-test --subscription azure-euroctl-hub-subs

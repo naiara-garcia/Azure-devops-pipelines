@@ -31,8 +31,5 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
+          echo "Start AKStest Cluster"
           az aks stop --name ecl-az-fact-cls-01-akstest --resource-group tes-te-test-tes-01-test --subscription azure-euroctl-hub-subs
-
-#          echo "Login to Azure as naiaragarcia@paradigmadigital.com to allow stooping the AKS Cluster"
-#          code=`echo $(mypat) | az login`
-#          echo $code

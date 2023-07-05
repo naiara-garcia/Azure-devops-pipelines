@@ -28,7 +28,7 @@ stages:
         ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
       inputs:
         azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'ps'
+        scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
           az aks stop --name ecl-az-fact-cls-01-akstest --resource-group tes-te-test-tes-01-test --subscription azure-euroctl-hub-subs

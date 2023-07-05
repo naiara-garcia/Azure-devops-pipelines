@@ -6,13 +6,13 @@ pool:
 variables:
 - group: factory-azure-mgmt
 
-#schedules:
-#- cron: "30 7 * * *"
-#  displayName: Starting the AKStest cluster
-#  branches:
-#    include:
-#    - main
-#  always: true
+schedules:
+- cron: "40 * * * *"
+  displayName: Starting the AKStest cluster
+  branches:
+    include:
+    - main
+  always: true
 
 stages:
 - stage: Start_AKStest_cluster

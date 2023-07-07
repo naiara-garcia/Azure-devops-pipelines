@@ -88,98 +88,105 @@ stages:
         inlineScript: |
           #!/bin/bash
 
-          echo "Download the repository $AZUREREPO"
-          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
+          echo "Checking that mail address is correct"
+          if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
+          then
+            echo "Download the repository $AZUREREPO"
+            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
 
-          echo "Create a new branch locally for $AZUREREPO repository"
-          cd $AZUREREPO/004-aad
-          git checkout -b $BRANCHTARGET
+            echo "Create a new branch locally for $AZUREREPO repository"
+            cd $AZUREREPO/004-aad
+            git checkout -b $BRANCHTARGET
 
-          echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
-          case ${{ parameters.option }} in
-            dpro_developer)
-              echo "Check that user is not currently at the group dpro_developer"
-              mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to dpro_developer group"
-                sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-                echo "User added to dpro_developer group"
-              fi
-            ;;
-            dplt_pipeline)
-              echo "Check that user is not currently at the dplt_pipeline Azure Group"
-              mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to dplt_pipeline Azure Group"
-                sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-              fi   
-              echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
-              mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to dplt_pipeline Azure Devops Group"
-                sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-                echo "User added to dplt_pipeline groups"
-              fi        
-            ;;
-            dplt_developer)
-              echo "Check that user is not currently at the group dplt_developer"
-              mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to dplt_developer Azure Devops Group"
-                sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-                echo "User added to dplt_developer group"
-              fi     
-            ;;
-            infra_admin)
-              echo "Check that user is not currently at the group infra_dev_owners"
-              mail=`sed -n '/^group_infra_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to infra_dev_owners group"
-                sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-              fi     
-              echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
-              mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to azdevops_dplt_admin_owners group"
-                sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-              fi       
-              echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
-              mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-              if [[ -z "$mail" ]] 
-              then 
-                echo "Adding new user to azdevops_dpro_admin_owners group"
-                sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-                echo "User added to infra_admin groups"
-              fi       
-            ;;
-            remove_user)
-              echo "Remove user from all groups"
-              sed -i "/${{ parameters.mail }}/d" terraform.tfvars
-              echo "User removed from all groups"
-            ;;
-            *)
-              echo "Bad option"
-            ;;
-          esac
+            echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
+            case ${{ parameters.option }} in
+              dpro_developer)
+                echo "Check that user is not currently at the group dpro_developer"
+                mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dpro_developer group"
+                  sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dpro_developer group"
+                fi
+              ;;
+              dplt_pipeline)
+                echo "Check that user is not currently at the dplt_pipeline Azure Group"
+                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Group"
+                  sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi   
+                echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
+                mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Devops Group"
+                  sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dplt_pipeline groups"
+                fi        
+              ;;
+              dplt_developer)
+                echo "Check that user is not currently at the group dplt_developer"
+                mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_developer Azure Devops Group"
+                  sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dplt_developer group"
+                fi     
+              ;;
+              infra_admin)
+                echo "Check that user is not currently at the group infra_dev_owners"
+                mail=`sed -n '/^group_infra_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to infra_dev_owners group"
+                  sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi     
+                echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
+                mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_dplt_admin_owners group"
+                  sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi       
+                echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
+                mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_dpro_admin_owners group"
+                  sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to infra_admin groups"
+                fi       
+              ;;
+              remove_user)
+                echo "Remove user from all groups"
+                sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+                echo "User removed from all groups"
+              ;;
+              *)
+                echo "Bad option"
+              ;;
+            esac
 
-          echo "Commit new branch to remote repository $AZUREREPO"
-          git add *
-          git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+            echo "Commit new branch to remote repository $AZUREREPO"
+            git add *
+            git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
-          echo "Push the new branch to remote repository $AZUREREPO"
-          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+            echo "Push the new branch to remote repository $AZUREREPO"
+            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
-          echo "Launched terraform commands"
-          echo "terraform init"
-          terraform init
-          echo "terraform apply"
-          terraform apply -auto-approve
+            echo "Launched terraform commands"
+            echo "terraform init"
+            terraform init
+            echo "terraform apply"
+            terraform apply -auto-approve
+            
+          else
+            echo "The mail format is not correct"
+          fi
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 

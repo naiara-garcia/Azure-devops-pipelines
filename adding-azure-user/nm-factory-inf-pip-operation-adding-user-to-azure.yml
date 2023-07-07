@@ -183,7 +183,7 @@ stages:
             terraform init
             echo "terraform apply"
             terraform apply -auto-approve
-            
+
           else
             echo "The mail format is not correct"
           fi
@@ -274,86 +274,93 @@ stages:
         inlineScript: |
           #!/bin/bash   
 
-          if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == remove_user ]]
+          echo "Checking that mail address is correct"
+          if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
           then
-            echo "Download the $AZUREDEVOPSREPO repository"
-            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
-
-            echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
-            cd $AZUREDEVOPSREPO
-            git checkout -b $BRANCHTARGET
-
-            case ${{ parameters.option }} in
-              dplt_pipeline)
-                echo "Check that user is not currently at the group all_users"
-                mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-                if [[ -z "$mail" ]] 
-                then 
-                  echo "Adding new user to all_users group"
-                  sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-                  echo "User added to all_users group"
-                fi
-              ;;
-              remove_user)
-                echo "Remove user from all groups"
-                sed -i "/${{ parameters.mail }}/d" terraform.tfvars
-                echo "User removed from all groups"
-              ;;
-              *)
-                echo "Bad option"
-              ;;
-            esac
-
-            echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
-            git add *
-            git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
-
-            echo "Login to az devops"
-            echo $(System.AccessToken) | az devops login
-
-            echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
-            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
-
-            echo "Launched terraform commands"
-            echo "terraform init"
-            terraform init
-            echo "terraform apply"
-            terraform apply -auto-approve
-
-            echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
-            STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
-            ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
-
-            echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
-            if [[ $STATUS == '0' ]]
+            if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == remove_user ]]
             then
-              echo "Current branch contains last changes from main in $AZUREDEVOPSREPO repository"
-            else
-              if [[ $ACTIVEPR > '0' ]]
+              echo "Download the $AZUREDEVOPSREPO repository"
+              git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
+
+              echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
+              cd $AZUREDEVOPSREPO
+              git checkout -b $BRANCHTARGET
+
+              case ${{ parameters.option }} in
+                dplt_pipeline)
+                  echo "Check that user is not currently at the group all_users"
+                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                  if [[ -z "$mail" ]] 
+                  then 
+                    echo "Adding new user to all_users group"
+                    sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                    echo "User added to all_users group"
+                  fi
+                ;;
+                remove_user)
+                  echo "Remove user from all groups"
+                  sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+                  echo "User removed from all groups"
+                ;;
+                *)
+                  echo "Bad option"
+                ;;
+              esac
+
+              echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
+              git add *
+              git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+              echo "Login to az devops"
+              echo $(System.AccessToken) | az devops login
+
+              echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
+              git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+
+              echo "Launched terraform commands"
+              echo "terraform init"
+              terraform init
+              echo "terraform apply"
+              terraform apply -auto-approve
+
+              echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
+              STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
+              ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
+
+              echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
+              if [[ $STATUS == '0' ]]
               then
-                echo "PR exists already at $AZUREDEVOPSREPO repository"
+                echo "Current branch contains last changes from main in $AZUREDEVOPSREPO repository"
               else
-                az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+                if [[ $ACTIVEPR > '0' ]]
+                then
+                  echo "PR exists already at $AZUREDEVOPSREPO repository"
+                else
+                  az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+                fi
               fi
+            fi    
+
+            echo "Get the PR ID to perform the merge action"
+            PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREDEVOPSREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
+
+            echo "Logout from Azure account"
+            az logout
+
+            if [[ -z "$PRID" ]]
+            then
+              echo "PR does not exist"
+            else
+              echo "Login to az devops as naiaragarcia@paradigmadigital.com"
+              echo $(mypat) | az devops login
+
+              echo "Approve the PR created"
+              az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+
+              echo "Merging the PR with main"
+              az repos pr update --org $ORGURL --id $PRID --status completed
             fi
-          fi      
 
-          echo "Get the PR ID to perform the merge action"
-          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREDEVOPSREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
-
-          echo "Logout from Azure account"
-          az logout
-
-          if [[ -z "$PRID" ]]
-          then
-            echo "PR does not exist"
           else
-            echo "Login to az devops as naiaragarcia@paradigmadigital.com"
-            echo $(mypat) | az devops login
-
-            echo "Approve the PR created"
-            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
-
-            echo "Merging the PR with main"
-            az repos pr update --org $ORGURL --id $PRID --status completed
+            echo "The mail format is not correct"  
           fi

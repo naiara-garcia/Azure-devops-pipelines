@@ -3,13 +3,13 @@ name: nm-factory-inf-pip-operation-stop-aksdev
 pool:
   name: Factory-VSS-Agents
 
-#schedules:
-#- cron: "00 19 * * 1-5"
-#  displayName: Stopping the AKStest cluster
-#  branches:
-#    include:
-#    - main
-#  always: true
+schedules:
+- cron: "00 19 * * 1-5"
+  displayName: Stopping the AKStest cluster
+  branches:
+    include:
+    - main
+  always: true
 
 stages:
 - stage: Stop_AKSdev_cluster

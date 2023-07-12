@@ -23,6 +23,7 @@ parameters:
   type: string
   values: 
   - dpro_developer
+  - avitech_slovakia
   - dplt_pipeline
   - dplt_developer
   - infra_admin
@@ -111,6 +112,14 @@ stages:
                 fi
               ;;
               dplt_pipeline)
+                echo "Check that user is not currently at the group dpro_developer"
+                mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dpro_developer group"
+                  sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dpro_developer group"
+                fi
                 echo "Check that user is not currently at the dplt_pipeline Azure Group"
                 mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
                 if [[ -z "$mail" ]] 
@@ -127,6 +136,23 @@ stages:
                   echo "User added to dplt_pipeline groups"
                 fi        
               ;;
+              avitech_slovakia)
+                echo "Check that user is not currently at the dplt_pipeline Azure Group"
+                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Group"
+                  sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi   
+                echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
+                mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Devops Group"
+                  sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dplt_pipeline groups"
+                fi        
+              ;;              
               dplt_developer)
                 echo "Check that user is not currently at the group dplt_developer"
                 mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
@@ -277,7 +303,7 @@ stages:
           echo "Checking that mail address is correct"
           if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
           then
-            if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == remove_user ]]
+            if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
             then
               echo "Download the $AZUREDEVOPSREPO repository"
               git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
@@ -288,6 +314,16 @@ stages:
 
               case ${{ parameters.option }} in
                 dplt_pipeline)
+                  echo "Check that user is not currently at the group all_users"
+                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                  if [[ -z "$mail" ]] 
+                  then 
+                    echo "Adding new user to all_users group"
+                    sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                    echo "User added to all_users group"
+                  fi
+                ;;
+                avitech_slovakia)
                   echo "Check that user is not currently at the group all_users"
                   mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
                   if [[ -z "$mail" ]] 

@@ -303,7 +303,7 @@ stages:
           echo "Checking that mail address is correct"
           if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
           then
-            if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia || [[ ${{ parameters.option }} == remove_user ]]
+            if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
             then
               echo "Download the $AZUREDEVOPSREPO repository"
               git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO

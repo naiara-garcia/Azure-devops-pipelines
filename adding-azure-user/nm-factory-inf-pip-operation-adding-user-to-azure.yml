@@ -320,6 +320,7 @@ stages:
               else
                 user_mail=${{ parameters.mail }}
               fi
+              echo $user_mail
 
               case ${{ parameters.option }} in
                 dplt_pipeline)

@@ -312,30 +312,39 @@ stages:
               cd $AZUREDEVOPSREPO
               git checkout -b $BRANCHTARGET
 
+              if [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
+              then 
+                user_mail=${{ parameters.mail }}
+                mail_int=${user_mail//#EXT#@asistemaspt.onmicrosoft.com}
+                user_mail=${mail_int/_/@}
+              else
+                user_mail=${{ parameters.mail }}
+              fi
+
               case ${{ parameters.option }} in
                 dplt_pipeline)
                   echo "Check that user is not currently at the group all_users"
-                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
                   if [[ -z "$mail" ]] 
                   then 
                     echo "Adding new user to all_users group"
-                    sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                    sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
                     echo "User added to all_users group"
                   fi
                 ;;
                 avitech_slovakia)
                   echo "Check that user is not currently at the group all_users"
-                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
                   if [[ -z "$mail" ]] 
                   then 
                     echo "Adding new user to all_users group"
-                    sed -i "/all_users/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                    sed -i "/all_users/a \ \ \"$user_mail"," terraform.tfvars
                     echo "User added to all_users group"
                   fi
                 ;;
                 remove_user)
                   echo "Remove user from all groups"
-                  sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+                  sed -i "/$user_mail/d" terraform.tfvars
                   echo "User removed from all groups"
                 ;;
                 *)

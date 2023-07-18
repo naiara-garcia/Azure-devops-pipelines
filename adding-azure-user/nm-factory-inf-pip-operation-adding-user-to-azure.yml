@@ -251,7 +251,7 @@ stages:
             fi
           fi      
 
-          echo "Logout from Azure"
+          echo "Logout from Azure account"
           az logout
 
     - task: AzureCLI@2
@@ -359,13 +359,6 @@ stages:
               git add *
               git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
-              echo "Install Azure Devops extension"
-              az config set extension.use_dynamic_install=yes_without_prompt
-              az extension add --name azure-devops
-
-              echo "Login to az devops"
-              echo $(System.AccessToken) | az devops login
-
               echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
               git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
@@ -394,7 +387,11 @@ stages:
           STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
           ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
 
-          echo "Login to az devops"
+          echo "Install Azure Devops extension"
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name azure-devops
+
+          echo "Login to az devops to allow PR creation"
           echo $(System.AccessToken) | az devops login
 
           echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"

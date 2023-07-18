@@ -292,6 +292,12 @@ stages:
               echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
               git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
+              echo "Launched terraform commands"
+              echo "terraform init"
+              terraform init
+              echo "terraform apply"
+              terraform apply -auto-approve
+
             else
               echo "Mail does not need to be added to Azure Devops"
             fi

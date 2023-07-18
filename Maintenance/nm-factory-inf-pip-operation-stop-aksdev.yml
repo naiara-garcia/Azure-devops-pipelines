@@ -4,11 +4,11 @@ pool:
   name: Factory-VSS-Agents
 
 schedules:
-- cron: "00 16 * * 1-5"
+- cron: "00 17 * * 1-5"
   displayName: Stopping the AKStest cluster
   branches:
     include:
-    - feat/DF-517-stop-start-aksdev
+    - main
   always: true
 
 stages:

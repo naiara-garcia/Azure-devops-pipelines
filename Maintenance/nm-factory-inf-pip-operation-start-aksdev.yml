@@ -8,7 +8,7 @@ schedules:
   displayName: Starting the AKStest cluster
   branches:
     include:
-    - feat/DF-517-stop-start-aksdev
+    - main
   always: true
 
 stages:

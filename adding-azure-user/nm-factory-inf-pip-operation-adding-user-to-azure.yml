@@ -76,223 +76,223 @@ stages:
 
     - checkout: nm-factory-inf-env-pro
         
-#    - task: AzureCLI@2
-#      displayName: "Clone repository to modify and push new branch" 
-#      env:
-#        ARM_CLIENT_ID: $(terraform-app-client-id)
-#        ARM_CLIENT_SECRET: $(terraform-app-secret)
-#        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
-#      inputs:
-#        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-#        scriptType: 'bash'
-#        scriptLocation: 'inlineScript'
-#        inlineScript: |
-#          #!/bin/bash
-#
-#          echo "Checking that mail address is correct"
-#          if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
-#          then
-#            echo "Download the repository $AZUREREPO"
-#            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
-#
-#            echo "Create a new branch locally for $AZUREREPO repository"
-#            cd $AZUREREPO/004-aad
-#            git checkout -b $BRANCHTARGET
-#
-#            echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
-#            case ${{ parameters.option }} in
-#              dpro_developer)
-#                echo "Check that user is not currently at the group dpro_developer"
-#                mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dpro_developer group"
-#                  sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                  echo "User added to dpro_developer group"
-#                fi
-#              ;;
-#              dplt_pipeline)
-#                echo "Check that user is not currently at the group dpro_developer"
-#                mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dpro_developer group"
-#                  sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                  echo "User added to dpro_developer group"
-#                fi
-#                echo "Check that user is not currently at the dplt_pipeline Azure Group"
-#                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dplt_pipeline Azure Group"
-#                  sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                fi   
-#                echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
-#                mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dplt_pipeline Azure Devops Group"
-#                  sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                  echo "User added to dplt_pipeline groups"
-#                fi        
-#              ;;
-#              avitech_slovakia)
-#                echo "Check that user is not currently at the dplt_pipeline Azure Group"
-#                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dplt_pipeline Azure Group"
-#                  sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                fi   
-#                echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
-#                mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dplt_pipeline Azure Devops Group"
-#                  sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                  echo "User added to dplt_pipeline groups"
-#                fi        
-#              ;;              
-#              dplt_developer)
-#                echo "Check that user is not currently at the group dplt_developer"
-#                mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to dplt_developer Azure Devops Group"
-#                  sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                  echo "User added to dplt_developer group"
-#                fi     
-#              ;;
-#              infra_admin)
-#                echo "Check that user is not currently at the group infra_dev_owners"
-#                mail=`sed -n '/^group_infra_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to infra_dev_owners group"
-#                  sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                fi     
-#                echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
-#                mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to azdevops_dplt_admin_owners group"
-#                  sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                fi       
-#                echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
-#                mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
-#                if [[ -z "$mail" ]] 
-#                then 
-#                  echo "Adding new user to azdevops_dpro_admin_owners group"
-#                  sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-#                  echo "User added to infra_admin groups"
-#                fi       
-#              ;;
-#              remove_user)
-#                echo "Remove user from all groups"
-#                sed -i "/${{ parameters.mail }}/d" terraform.tfvars
-#                echo "User removed from all groups"
-#              ;;
-#              *)
-#                echo "Bad option"
-#              ;;
-#            esac
-#
-#            echo "Commit new branch to remote repository $AZUREREPO"
-#            git add *
-#            git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
-#
-#            echo "Push the new branch to remote repository $AZUREREPO"
-#            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
-#
-#            echo "Launched terraform commands"
-#            echo "terraform init"
-#            terraform init
-#            echo "terraform apply"
-#            terraform apply -auto-approve
-#
-#          else
-#            echo "The mail format is not correct"
-#          fi
-#
-#    - task: AzureCLI@2
-#      displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
-#      env:
-#        ARM_CLIENT_ID: $(terraform-app-client-id)
-#        ARM_CLIENT_SECRET: $(terraform-app-secret)
-#        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
-#      inputs:
-#        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-#        scriptType: 'bash'
-#        scriptLocation: 'inlineScript'
-#        inlineScript: |
-#          #!/bin/bash    
-#
-#          echo "Create needed variables for the PR at $AZUREREPO repository"
-#          STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
-#          ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
-#
-#          echo "Install Azure Devops extension"
-#          az config set extension.use_dynamic_install=yes_without_prompt
-#          az extension add --name azure-devops
-#
-#          echo "Login to az devops to allow PR creation"
-#          echo $(System.AccessToken) | az devops login
-#
-#          echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREREPO repository"
-#          if [[ $STATUS == '0' ]]
-#          then
-#            echo "Current branch contains last changes from main in $AZUREREPO repository"
-#          else
-#            if [[ $ACTIVEPR > '0' ]]
-#            then
-#              echo "PR exists already at $AZUREREPO repository"
-#            else
-#              az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
-#            fi
-#          fi      
-#
-#          echo "Logout from Azure"
-#          az logout
-#
-#    - task: AzureCLI@2
-#      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
-#      env:
-#        ARM_CLIENT_ID: $(terraform-app-client-id)
-#        ARM_CLIENT_SECRET: $(terraform-app-secret)
-#        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
-#      inputs:
-#        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-#        scriptType: 'bash'
-#        scriptLocation: 'inlineScript'
-#        inlineScript: |
-#          #!/bin/bash    
-#
-#          echo "Login to az devops to allow PR approvation and merged"
-#          echo $(mypat) | az devops login --organization $ORGURL
-#
-#          echo "Get the PR ID to perform the merge action"
-#          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
-#
-#          if [[ -z "$PRID" ]]
-#          then
-#            echo "PR does not exist"
-#          else
-#            echo "Approve the PR created"
-#            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
-#
-#            echo "Merging the PR with main"
-#            az repos pr update --org $ORGURL --id $PRID --status completed
-#          fi
-#
-#          echo "Logout from Azure account"
-#          az logout
-#
+    - task: AzureCLI@2
+      displayName: "Clone repository to modify and push new branch" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+
+          echo "Checking that mail address is correct"
+          if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
+          then
+            echo "Download the repository $AZUREREPO"
+            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
+
+            echo "Create a new branch locally for $AZUREREPO repository"
+            cd $AZUREREPO/004-aad
+            git checkout -b $BRANCHTARGET
+
+            echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
+            case ${{ parameters.option }} in
+              dpro_developer)
+                echo "Check that user is not currently at the group dpro_developer"
+                mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dpro_developer group"
+                  sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dpro_developer group"
+                fi
+              ;;
+              dplt_pipeline)
+                echo "Check that user is not currently at the group dpro_developer"
+                mail=`sed -n '/^group_infra_dprodev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dpro_developer group"
+                  sed -i "/group_infra_dprodev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dpro_developer group"
+                fi
+                echo "Check that user is not currently at the dplt_pipeline Azure Group"
+                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Group"
+                  sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi   
+                echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
+                mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Devops Group"
+                  sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dplt_pipeline groups"
+                fi        
+              ;;
+              avitech_slovakia)
+                echo "Check that user is not currently at the dplt_pipeline Azure Group"
+                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Group"
+                  sed -i "/group_dpro_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi   
+                echo "Check that user is not currently at the dplt_pipeline Azure Devops Group"
+                mail=`sed -n '/^group_azdevops_dpro_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_pipeline Azure Devops Group"
+                  sed -i "/group_azdevops_dpro_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dplt_pipeline groups"
+                fi        
+              ;;              
+              dplt_developer)
+                echo "Check that user is not currently at the group dplt_developer"
+                mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_developer Azure Devops Group"
+                  sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to dplt_developer group"
+                fi     
+              ;;
+              infra_admin)
+                echo "Check that user is not currently at the group infra_dev_owners"
+                mail=`sed -n '/^group_infra_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to infra_dev_owners group"
+                  sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi     
+                echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
+                mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_dplt_admin_owners group"
+                  sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi       
+                echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
+                mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_dpro_admin_owners group"
+                  sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                  echo "User added to infra_admin groups"
+                fi       
+              ;;
+              remove_user)
+                echo "Remove user from all groups"
+                sed -i "/${{ parameters.mail }}/d" terraform.tfvars
+                echo "User removed from all groups"
+              ;;
+              *)
+                echo "Bad option"
+              ;;
+            esac
+
+            echo "Commit new branch to remote repository $AZUREREPO"
+            git add *
+            git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+
+            echo "Push the new branch to remote repository $AZUREREPO"
+            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+
+            echo "Launched terraform commands"
+            echo "terraform init"
+            terraform init
+            echo "terraform apply"
+            terraform apply -auto-approve
+
+          else
+            echo "The mail format is not correct"
+          fi
+
+    - task: AzureCLI@2
+      displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Create needed variables for the PR at $AZUREREPO repository"
+          STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
+          ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
+
+          echo "Install Azure Devops extension"
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name azure-devops
+
+          echo "Login to az devops to allow PR creation"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREREPO repository"
+          if [[ $STATUS == '0' ]]
+          then
+            echo "Current branch contains last changes from main in $AZUREREPO repository"
+          else
+            if [[ $ACTIVEPR > '0' ]]
+            then
+              echo "PR exists already at $AZUREREPO repository"
+            else
+              az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+            fi
+          fi      
+
+          echo "Logout from Azure"
+          az logout
+
+    - task: AzureCLI@2
+      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Login to az devops to allow PR approvation and merged"
+          echo $(mypat) | az devops login --organization $ORGURL
+
+          echo "Get the PR ID to perform the merge action"
+          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
+
+          if [[ -z "$PRID" ]]
+          then
+            echo "PR does not exist"
+          else
+            echo "Approve the PR created"
+            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+
+            echo "Merging the PR with main"
+            az repos pr update --org $ORGURL --id $PRID --status completed
+          fi
+
+          echo "Logout from Azure account"
+          az logout
+
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
       inputs:
         azureSubscription: 'ecl-az-fact-svc-01-armconnection'
         scriptType: 'bash'
@@ -303,8 +303,10 @@ stages:
           echo "Checking that mail address is correct"
           if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
           then
+            echo "Mail has correct format"
             if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
             then
+              echo "Option includes Azure Devops License addition"
               echo "Download the $AZUREDEVOPSREPO repository"
               git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
 
@@ -320,8 +322,8 @@ stages:
               else
                 user_mail=${{ parameters.mail }}
               fi
-              echo $user_mail
 
+              echo "Added a new line to terraform.tfvars file at $AZUREDEVOPSREPO repository"              
               case ${{ parameters.option }} in
                 dplt_pipeline)
                   echo "Check that user is not currently at the group all_users"
@@ -339,7 +341,7 @@ stages:
                   if [[ -z "$mail" ]] 
                   then 
                     echo "Adding new user to all_users group"
-                    sed -i "/all_users/a \ \ \"$user_mail"," terraform.tfvars
+                    sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
                     echo "User added to all_users group"
                   fi
                 ;;
@@ -357,53 +359,66 @@ stages:
               git add *
               git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
+              echo "Install Azure Devops extension"
+              az config set extension.use_dynamic_install=yes_without_prompt
+              az extension add --name azure-devops
+
               echo "Login to az devops"
               echo $(System.AccessToken) | az devops login
 
               echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
               git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
 
-              echo "Launched terraform commands"
-              echo "terraform init"
-              terraform init
-              echo "terraform apply"
-              terraform apply -auto-approve
-
-              echo "Install Azure Devops extension"
-              az config set extension.use_dynamic_install=yes_without_prompt
-              az extension add --name azure-devops
-
-              echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
-              STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
-              ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
-
-              echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
-              if [[ $STATUS == '0' ]]
-              then
-                echo "Current branch contains last changes from main in $AZUREDEVOPSREPO repository"
-              else
-                if [[ $ACTIVEPR > '0' ]]
-                then
-                  echo "PR exists already at $AZUREDEVOPSREPO repository"
-                else
-                  az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
-                fi
-              fi
-            fi    
-
-            echo "Logout from azure account"
-            az logout
+            else
+              echo "Mail does not need to be added to Azure Devops"
+            fi
 
           else
-            echo "The mail format is not correct"  
+            echo "The mail format is not correct"
           fi
+
+    - task: AzureCLI@2
+      displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash   
+
+          echo "Create needed variables for the PR at $AZUREDEVOPSREPO repository"
+          STATUS=`curl -u :$(System.AccessToken) $AZUREDEVURIBRANCHSTATUS | jq -r .aheadCount`
+          ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREDEVURICHECKACTIVEPR | jq -r .count`
+
+          echo "Login to az devops"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREDEVOPSREPO repository"
+          if [[ $STATUS == '0' ]]
+          then
+            echo "Current branch contains last changes from main in $AZUREDEVOPSREPO repository"
+          else
+            if [[ $ACTIVEPR > '0' ]]
+            then
+              echo "PR exists already at $AZUREDEVOPSREPO repository"
+            else
+              az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+            fi
+          fi
+
+          echo "Logout from Azure account"
+          az logout
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
       inputs:
         azureSubscription: 'ecl-az-fact-svc-01-armconnection'
         scriptType: 'bash'

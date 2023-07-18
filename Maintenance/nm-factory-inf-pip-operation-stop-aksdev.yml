@@ -1,0 +1,32 @@
+name: nm-factory-inf-pip-operation-stop-aksdev
+
+pool:
+  name: Factory-VSS-Agents
+
+schedules:
+- cron: "00 17 * * 1-5"
+  displayName: Stopping the AKStest cluster
+  branches:
+    include:
+    - main
+  always: true
+
+stages:
+- stage: Stop_AKSdev_cluster
+  jobs:
+  - job: stop_aksdev_cluster
+
+    steps:
+    - task: AzureCLI@2
+      displayName: "Stop AKSdev cluster" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Stop AKSdev Cluster"
+          az aks stop --name ecl-az-fact-cls-01-aksdev --resource-group ecl-az-fact-rgp-01-global --subscription azure-euroctl-hub-subs

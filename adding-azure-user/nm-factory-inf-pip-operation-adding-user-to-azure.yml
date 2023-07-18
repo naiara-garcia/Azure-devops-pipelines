@@ -214,76 +214,6 @@ stages:
             echo "The mail format is not correct"
           fi
 
-    - task: AzureCLI@2
-      displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash    
-
-          echo "Create needed variables for the PR at $AZUREREPO repository"
-          STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
-          ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
-
-          echo "Install Azure Devops extension"
-          az config set extension.use_dynamic_install=yes_without_prompt
-          az extension add --name azure-devops
-
-          echo "Login to az devops to allow PR creation"
-          echo $(System.AccessToken) | az devops login
-
-          echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREREPO repository"
-          if [[ $STATUS == '0' ]]
-          then
-            echo "Current branch contains last changes from main in $AZUREREPO repository"
-          else
-            if [[ $ACTIVEPR > '0' ]]
-            then
-              echo "PR exists already at $AZUREREPO repository"
-            else
-              az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
-            fi
-          fi      
-
-          echo "Logout from Azure account"
-          az logout
-
-    - task: AzureCLI@2
-      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash    
-
-          echo "Login to az devops to allow PR approvation and merged"
-          echo $(mypat) | az devops login --organization $ORGURL
-
-          echo "Get the PR ID to perform the merge action"
-          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
-
-          if [[ -z "$PRID" ]]
-          then
-            echo "PR does not exist"
-          else
-            echo "Approve the PR created"
-            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
-
-            echo "Merging the PR with main"
-            az repos pr update --org $ORGURL --id $PRID --status completed
-          fi
-
           echo "Logout from Azure account"
           az logout
 
@@ -370,6 +300,49 @@ stages:
             echo "The mail format is not correct"
           fi
 
+          echo "Logout from Azure account"
+          az logout
+
+    - task: AzureCLI@2
+      displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Create needed variables for the PR at $AZUREREPO repository"
+          STATUS=`curl -u :$(System.AccessToken) $AZUREURIBRANCHSTATUS | jq -r .aheadCount`
+          ACTIVEPR=`curl -u :$(System.AccessToken) $AZUREURICHECKACTIVEPR | jq -r .count`
+
+          echo "Install Azure Devops extension"
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name azure-devops
+
+          echo "Login to az devops to allow PR creation"
+          echo $(System.AccessToken) | az devops login
+
+          echo "Check that the branch has changes from main and also that the PR is not created previously before creating the new PR at $AZUREREPO repository"
+          if [[ $STATUS == '0' ]]
+          then
+            echo "Current branch contains last changes from main in $AZUREREPO repository"
+          else
+            if [[ $ACTIVEPR > '0' ]]
+            then
+              echo "PR exists already at $AZUREREPO repository"
+            else
+              az repos pr create -r $AZUREREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
+            fi
+          fi      
+
+          echo "Logout from Azure account"
+          az logout
+
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
       env:
@@ -405,6 +378,39 @@ stages:
             else
               az repos pr create -r $AZUREDEVOPSREPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket ${{ parameters.branch }}" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "${{ parameters.branch }}" "" "Close or affect [this](https://jira.eurocontrol.int/browse/${{ parameters.branch }}) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket ${{ parameters.branch }}"   
             fi
+          fi
+
+          echo "Logout from Azure account"
+          az logout
+
+    - task: AzureCLI@2
+      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash    
+
+          echo "Login to az devops to allow PR approvation and merged"
+          echo $(mypat) | az devops login --organization $ORGURL
+
+          echo "Get the PR ID to perform the merge action"
+          PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $AZUREREPO -s $BRANCHTARGET | grep codeReviewId | awk '{print $2}' | cut -d',' -f1`
+
+          if [[ -z "$PRID" ]]
+          then
+            echo "PR does not exist"
+          else
+            echo "Approve the PR created"
+            az repos pr set-vote --org $ORGURL --id $PRID --vote approve
+
+            echo "Merging the PR with main"
+            az repos pr update --org $ORGURL --id $PRID --status completed
           fi
 
           echo "Logout from Azure account"

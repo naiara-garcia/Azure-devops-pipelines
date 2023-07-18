@@ -3,6 +3,8 @@ name: nm-factory-inf-pip-operation-start-aksdev
 pool:
   name: Factory-VSS-Agents
 
+trigger: none
+
 schedules:
 - cron: "30 5 * * 1-5"
   displayName: Starting the AKStest cluster

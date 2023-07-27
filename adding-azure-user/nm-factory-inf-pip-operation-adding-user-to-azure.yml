@@ -10,6 +10,7 @@ resources:
   - repository: nm-factory-inf-pip-operations
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
+    ref: feat/DF-641-prevent-task-duplication
 
 variables:
 - group: factory-azure-mgmt

@@ -269,14 +269,15 @@ stages:
             echo "terraform apply"
             terraform apply -auto-approve
 
+            echo "Moving back to working path"
+            cd ../..
+
           else
             echo "The mail format is not correct"
           fi
 
           echo "Logout from Azure account"
           az logout
-
-          cd ../..
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
@@ -373,14 +374,15 @@ stages:
               echo "Mail does not need to be added to Azure Devops"
             fi
 
+            echo "Moving back to working path"
+            cd ..            
+
           else
             echo "The mail format is not correct"
           fi
 
           echo "Logout from Azure account"
           az logout
-
-          cd ..
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
@@ -393,8 +395,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          ls adding-azure-user
-          bash adding-azure-user/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
@@ -407,7 +408,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
@@ -420,7 +421,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
+          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
 
     - task: AzureCLI@2
@@ -438,5 +439,5 @@ stages:
 
           if [[ ${{ parameters.option }} == infra_admin ]] || ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
           then
-            bash adding-azure-user/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
+            bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
           fi

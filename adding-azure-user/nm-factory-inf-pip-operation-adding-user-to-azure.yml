@@ -308,7 +308,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash $(System.DefaultWorkingDirectory)/adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
@@ -321,7 +321,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash $(System.DefaultWorkingDirectory)/adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
@@ -334,7 +334,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
+          bash $(System.DefaultWorkingDirectory)/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
 
     - task: AzureCLI@2
@@ -352,5 +352,5 @@ stages:
 
           if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
           then
-            bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
+            bash $(System.DefaultWorkingDirectory)/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
           fi

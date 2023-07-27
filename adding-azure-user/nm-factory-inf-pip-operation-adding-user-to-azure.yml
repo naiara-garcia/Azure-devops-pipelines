@@ -5,11 +5,11 @@ trigger: none # will disable CI builds entirely
 pool:
   name: Factory-VSS-Agents
 
-#resources:
-#  repositories:
-#  - repository: nm-factory-inf-env-pro
-#    type: git
-#    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+resources:
+  repositories:
+  - repository: nm-factory-inf-pip-operations
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
 
 variables:
 - group: factory-azure-mgmt
@@ -62,7 +62,7 @@ stages:
       inputs:
         terraformVersion: 1.3.0
 
-#    - checkout: nm-factory-inf-env-pro
+    - checkout: nm-factory-inf-pip-operations
         
     - task: AzureCLI@2
       displayName: "Clone repository to modify and push new branch" 

@@ -391,7 +391,7 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           pwd
-          bash creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash azure-adding-user/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
@@ -404,7 +404,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash azure-adding-user/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
@@ -417,7 +417,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
+          bash azure-adding-user/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
 
     - task: AzureCLI@2
@@ -435,5 +435,5 @@ stages:
 
           if [[ ${{ parameters.option }} == infra_admin ]] || ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
           then
-            bash approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
+            bash azure-adding-user/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
           fi

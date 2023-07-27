@@ -391,6 +391,7 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           pwd
+          ls -lat
           bash azure-adding-user/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2

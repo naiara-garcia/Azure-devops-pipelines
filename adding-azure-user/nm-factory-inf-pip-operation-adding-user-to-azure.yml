@@ -275,6 +275,8 @@ stages:
           echo "Logout from Azure account"
           az logout
 
+          cd ..
+
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
       env:
@@ -388,6 +390,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
+          pwd
           bash creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2

@@ -158,20 +158,90 @@ stages:
                 then 
                   echo "Adding new user to infra_dev_owners group"
                   sed -i "/group_infra_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group infra_dprodev_owners"
+                mail=`sed -n '/^group_infra_dprodev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to infra_dprodev_owners group"
+                  sed -i "/group_infra_dprodev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
                 fi     
+                echo "Check that user is not currently at the group dplt_dev_owners"
+                mail=`sed -n '/^group_dplt_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dplt_dev_owners group"
+                  sed -i "/group_dplt_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group dpro_dev_owners"
+                mail=`sed -n '/^group_dpro_dev_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to dpro_dev_owners group"
+                  sed -i "/group_dpro_dev_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group global_reader_owners"
+                mail=`sed -n '/^group_global_reader_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to global_reader_owners group"
+                  sed -i "/group_global_reader_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group azdevops_org_admin_owners"
+                mail=`sed -n '/^group_azdevops_org_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_org_admin_owners group"
+                  sed -i "/group_azdevops_org_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group azdevops_org_admin_members"
+                mail=`sed -n '/^group_azdevops_org_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_org_admin_members group"
+                  sed -i "/group_azdevops_org_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group azdevops_prj_admin_owners"
+                mail=`sed -n '/^group_azdevops_prj_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_prj_admin_owners group"
+                  sed -i "/group_azdevops_prj_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group azdevops_prj_admin_members"
+                mail=`sed -n '/^group_azdevops_prj_admin_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_prj_admin_members group"
+                  sed -i "/group_azdevops_prj_admin_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
+                echo "Check that user is not currently at the group azdevops_prj_contributor_owners"
+                mail=`sed -n '/^group_azdevops_prj_contributor_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_prj_contributor_owners group"
+                  sed -i "/group_azdevops_prj_contributor_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi
                 echo "Check that user is not currently at the group azdevops_dplt_admin_owners"
                 mail=`sed -n '/^group_azdevops_dplt_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
                 if [[ -z "$mail" ]] 
                 then 
                   echo "Adding new user to azdevops_dplt_admin_owners group"
                   sed -i "/group_azdevops_dplt_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
-                fi       
+                fi   
                 echo "Check that user is not currently at the group azdevops_dpro_admin_owners"
                 mail=`sed -n '/^group_azdevops_dpro_admin_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
                 if [[ -z "$mail" ]] 
                 then 
                   echo "Adding new user to azdevops_dpro_admin_owners group"
                   sed -i "/group_azdevops_dpro_admin_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                fi     
+                echo "Check that user is not currently at the group azdevops_support_contrib_owners"
+                mail=`sed -n '/^group_azdevops_support_contrib_owners/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                if [[ -z "$mail" ]] 
+                then 
+                  echo "Adding new user to azdevops_support_contrib_owners group"
+                  sed -i "/group_azdevops_support_contrib_owners/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
                   echo "User added to infra_admin groups"
                 fi       
               ;;
@@ -222,7 +292,7 @@ stages:
           if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
           then
             echo "Mail has correct format"
-            if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
+            if [[ ${{ parameters.option }} == infra_admin ]] || ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
             then
               echo "Option includes Azure Devops License addition"
               echo "Download the $AZUREDEVOPSREPO repository"
@@ -243,6 +313,16 @@ stages:
 
               echo "Added a new line to terraform.tfvars file at $AZUREDEVOPSREPO repository"              
               case ${{ parameters.option }} in
+                infra_admin)
+                  echo "Check that user is not currently at the group all_users"
+                  mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+                  if [[ -z "$mail" ]] 
+                  then 
+                    echo "Adding new user to all_users group"
+                    sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                    echo "User added to all_users group"
+                  fi
+                ;;              
                 dplt_pipeline)
                   echo "Check that user is not currently at the group all_users"
                   mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
@@ -350,7 +430,7 @@ stages:
         inlineScript: |
           #!/bin/bash    
 
-          if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
+          if [[ ${{ parameters.option }} == infra_admin ]] || ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
           then
             bash approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
           fi

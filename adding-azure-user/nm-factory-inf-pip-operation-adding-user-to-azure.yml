@@ -275,7 +275,7 @@ stages:
           echo "Logout from Azure account"
           az logout
 
-          cd ..
+          cd ../..
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
@@ -378,6 +378,8 @@ stages:
 
           echo "Logout from Azure account"
           az logout
+
+          cd ..
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 

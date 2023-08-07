@@ -15,15 +15,13 @@ schedules:
 
 resources:
   repositories:
+  - repository: nm-factory-inf-pip-terraform
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform  
   - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
-  - repository: nm-factory-inf-mod-naming
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-mod-naming
-  - repository: nm-factory-inf-mod-vm
-    type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-mod-vm    
+        
 stages:
 - stage: recreate_jenkins_agent_vm 
   jobs:
@@ -36,6 +34,15 @@ stages:
         KeyVaultName: 'ecl-az-seed-kvt-01-tfkv'
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
+
+    - checkout: nm-factory-inf-pip-terraform
+
+    - task: AzureCLI@2
+      displayName: 'Install SSH Keys'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: bash
+        scriptPath: '$(System.DefaultWorkingDirectory)/bash/az_ssh_install.sh'
 
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
       displayName: 'Install Terraform 1.3.0'

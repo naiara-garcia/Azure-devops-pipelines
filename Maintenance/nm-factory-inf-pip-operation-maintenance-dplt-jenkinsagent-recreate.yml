@@ -36,6 +36,23 @@ stages:
         RunAsPreJob: true
 
     - task: AzureCLI@2
+      displayName: "Check directory SSH" 
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+
+          set -o errexit  # Exit on error
+          set -o nounset  # Exit on uninitalized vars
+          set -o pipefail # Exit on pipe exec fail
+          
+          ls -lrtha '$(System.DefaultWorkingDirectory)'
+          ls -lrtha '$(System.DefaultWorkingDirectory)/nm-factory-inf-pip-terraform'
+          ls -lrtha '$(System.DefaultWorkingDirectory)/nm-factory-inf-pip-terraform/bash'
+
+    - task: AzureCLI@2
       displayName: 'Install SSH Keys'
       inputs:
         azureSubscription: 'ecl-az-fact-svc-01-armconnection'

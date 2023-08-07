@@ -27,9 +27,6 @@ stages:
   jobs:
   - job: recreate_jenkins_agent_vm
     steps:
-
-    - checkout: nm-factory-inf-pip-terraform
-
     - task: AzureKeyVault@2
       displayName: 'Azure Key Vault: ecl-az-seed-kvt-01-tfkv'
       inputs:
@@ -38,6 +35,7 @@ stages:
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 
+    - checkout: nm-factory-inf-pip-terraform
     - task: AzureCLI@2
       displayName: 'Install SSH Keys'
       inputs:

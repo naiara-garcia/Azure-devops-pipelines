@@ -17,7 +17,7 @@ resources:
   repositories:
   - repository: nm-factory-inf-pip-terraform
     type: git
-    name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform  
+    name: ecl-ado-prj-iac/nm-factory-inf-pip-terraform
   - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
@@ -35,24 +35,12 @@ stages:
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 
-    - checkout: nm-factory-inf-pip-terraform
     - task: AzureCLI@2
       displayName: 'Install SSH Keys'
       inputs:
         azureSubscription: 'ecl-az-fact-svc-01-armconnection'
         scriptType: bash
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash
-
-          set -o errexit  # Exit on error
-          set -o nounset  # Exit on uninitalized vars
-          set -o pipefail # Exit on pipe exec fail
-          ls -lrtha
-          ls -lrtha $(System.DefaultWorkingDirectory)
-        displayName: 'Test'
-
-    - checkout: nm-factory-inf-env-pro
+        scriptPath: '$(System.DefaultWorkingDirectory)/nm-factory-inf-pip-terraform/bash/az_ssh_install.sh'
         
     - task: AzureCLI@2
       displayName: "Recreate DPLT Jenkins Agent" 
@@ -71,7 +59,7 @@ stages:
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
 
-          cd $(System.DefaultWorkingDirectory)/200-jenkins-agent-vm-dplt
+          cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-vm-dplt
           echo "terraform init"
           terraform init
           echo "terraform plan -auto-approve --replace=module.virtual_machine.azurerm_linux_virtual_machine.main"

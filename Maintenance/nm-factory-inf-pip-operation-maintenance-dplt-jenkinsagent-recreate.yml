@@ -35,6 +35,8 @@ stages:
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 
+    - checkout: nm-factory-inf-pip-terraform
+    
     - task: AzureCLI@2
       displayName: "Check directory SSH" 
       inputs:

@@ -37,7 +37,7 @@ stages:
         KeyVaultName: 'ecl-az-seed-kvt-01-tfkv'
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
-        
+
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
       displayName: 'Install Terraform 1.3.0'
       inputs:
@@ -85,5 +85,5 @@ stages:
           cd $(System.DefaultWorkingDirectory)/nm-factory-inf-env-pro/200-jenkins-agent-vm-dplt
           echo "terraform init"
           terraform init
-          echo "terraform plan -auto-approve --replace=module.virtual_machine.azurerm_linux_virtual_machine.main"
-          terraform plan -auto-approve --replace=module.virtual_machine.azurerm_linux_virtual_machine.main
+          echo "terraform plan --replace=module.virtual_machine.azurerm_linux_virtual_machine.main"
+          terraform plan --replace=module.virtual_machine.azurerm_linux_virtual_machine.main

@@ -27,6 +27,7 @@ stages:
   jobs:
   - job: recreate_jenkins_agent_vm
     steps:
+
     - checkout: nm-factory-inf-pip-terraform
 
     - task: AzureKeyVault@2
@@ -49,7 +50,7 @@ stages:
           set -o errexit  # Exit on error
           set -o nounset  # Exit on uninitalized vars
           set -o pipefail # Exit on pipe exec fail
-
+          ls -lrtha
           ls -lrtha $(System.DefaultWorkingDirectory)
         displayName: 'Test'
 

@@ -126,7 +126,7 @@ stages:
               ;;
               avitech_slovakia)
                 echo "Check that user is not currently at the dplt_pipeline Azure Group"
-                mail=`sed -n '/^group_dpro_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+                mail=`sed -n '/^ /,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
                 if [[ -z "$mail" ]] 
                 then 
                   echo "Adding new user to dplt_pipeline Azure Group"
@@ -256,6 +256,7 @@ stages:
             esac
 
             echo "Commit new branch to remote repository $AZUREREPO"
+            git config --global "ecl-az-seed-app-01-terraform"
             git add *
             git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
@@ -357,6 +358,7 @@ stages:
               esac
 
               echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
+              git config --global "ecl-az-seed-app-01-terraform"
               git add *
               git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 

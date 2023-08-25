@@ -256,7 +256,8 @@ stages:
             esac
 
             echo "Commit new branch to remote repository $AZUREREPO"
-            git config --global "ecl-az-seed-app-01-terraform"
+            git config --global user.email "adrianmartin@paradigmadigital.com"
+            git config --global user.name "Adrian Martin Garcia"
             git add *
             git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 
@@ -358,7 +359,8 @@ stages:
               esac
 
               echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
-              git config --global "ecl-az-seed-app-01-terraform"
+              git config --global user.email "adrianmartin@paradigmadigital.com"
+              git config --global user.name "Adrian Martin Garcia"
               git add *
               git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
 

@@ -29,6 +29,6 @@ jobs:
   - script: |
       chmod +x ./keycloak-user-mgmt-factory.sh
 
-      docker run --entrypoint `pwd`/keycloak-user-mgmt-factory.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ parameters.mail}} ${{ parameters.option}} $(password)
+      docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt-factory.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ parameters.mail}} ${{ parameters.option}} $(password)
 
       echo "Execution finished"

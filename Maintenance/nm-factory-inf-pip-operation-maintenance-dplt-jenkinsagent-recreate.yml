@@ -42,7 +42,7 @@ stages:
       displayName: 'Azure Key Vault: $(azKeyVaultNameTerraform)'
       inputs:
         azureSubscription: $(azSubscription)
-        KeyVaultName: '$(azKeyVaultNameTerraform)'
+        KeyVaultName: $(azKeyVaultNameTerraform)
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 

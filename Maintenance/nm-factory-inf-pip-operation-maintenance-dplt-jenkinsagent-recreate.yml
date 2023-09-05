@@ -39,10 +39,10 @@ stages:
     - checkout: nm-factory-inf-env-pro
 
     - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault: $(azKeyVaultNameTerraform)'
+      displayName: 'Azure Key Vault: ${{ variables.azKeyVaultNameTerraform }}'
       inputs:
-        azureSubscription: $(azSubscription)
-        KeyVaultName: $(azKeyVaultNameTerraform)
+        azureSubscription: ${{ variables.azSubscription }}
+        KeyVaultName: ${{ variables.azKeyVaultNameTerraform }}
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 
@@ -50,7 +50,7 @@ stages:
       displayName: "Install TFenv"
       condition: succeeded()
       inputs:
-        azureSubscription: $(azSubscription)
+        azureSubscription: ${{ variables.azSubscription }}
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
@@ -65,7 +65,7 @@ stages:
     - task: AzureCLI@2
       displayName: 'Install SSH Keys'
       inputs:
-        azureSubscription: $(azSubscription)
+        azureSubscription: ${{ variables.azSubscription }}
         scriptType: bash
         scriptPath: '$(System.DefaultWorkingDirectory)/nm-factory-inf-pip-terraform/bash/az_ssh_install.sh'
         
@@ -74,9 +74,9 @@ stages:
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: $(azTenantId)'  #Must move to KeyValut or inside provider.tf
+        ARM_TENANT_ID: ${{ variables.azTenantId }}  #Must move to KeyValut or inside provider.tf
       inputs:
-        azureSubscription: $(azSubscription)
+        azureSubscription: ${{ variables.azSubscription }}
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |

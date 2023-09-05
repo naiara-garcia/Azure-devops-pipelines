@@ -33,6 +33,8 @@ else
     echo "PR exists already at $REPO repository"
   else
     az repos pr create -r $REPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket $BRANCH" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "$BRANCH" "" "Close or affect [this](https://jira.eurocontrol.int/browse/$BRANCH) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [ ] The PR has a descriptive title" "- [ ] The changes section has been checked" "- [ ] A person has been assigned to this PR" "- [ ] Clear comments `<-- -->` from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket $BRANCH"   
+    echo "Checking the terraform code using tf pipeline"
+    sleep 420
   fi
 fi      
 

@@ -57,10 +57,20 @@ stages:
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-      displayName: 'Install Terraform 1.3.0'
+    - task: AzureCLI@2
+      displayName: "Install TFenv"
       inputs:
-        terraformVersion: 1.3.0
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+          if [ -f "/usr/local/bin/tfenv" ]; then
+            echo "[INFO] TFenv already exists"
+          else
+            git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+            sudo ln -s ~/.tfenv/bin/* /usr/local/bin
+          fi
 
     - checkout: nm-factory-inf-pip-operations
         

@@ -78,6 +78,14 @@ stages:
       clean: true
 
     - task: Bash@3
+      displayName: "Remove local repositories"
+      inputs:
+        targetType: inline
+        script: |
+          rm -fR nm-factory-inf-env-pro
+          rm -fR nm-factory-inf-env-azdevops
+
+    - task: Bash@3
       displayName: "Checking that the mail is correct"
       inputs:
         targetType: inline

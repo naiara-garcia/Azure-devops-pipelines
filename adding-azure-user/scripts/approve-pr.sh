@@ -17,7 +17,7 @@ PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $REPO -s $BRANCHTARGET | gre
 if [[ -z "$PRID" ]]
 then
   echo "PR does not exist"
-
+  exit 1
 else
   echo "Approve the PR created"
   az repos pr set-vote --org $ORGURL --id $PRID --vote approve

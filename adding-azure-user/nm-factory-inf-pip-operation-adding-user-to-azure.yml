@@ -90,8 +90,16 @@ stages:
             exit 1
           fi
 
+    - task: Bash@3
+      displayName: "Config git user to proceed with commit"
+      inputs:
+        targetType: inline
+        script: |
+          git config --global user.email build_service@eurocontrol.com
+          git config --global user.name "Build Service" 
+
     - task: AzureCLI@2
-      displayName: "Clone repository to modify and push new branch" 
+      displayName: "Adding user to Azure AD groups" 
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -277,13 +285,25 @@ stages:
           esac
 
           echo "Commit new branch to remote repository $AZUREREPO"
-          git config --global user.email "adrianmartin@paradigmadigital.com"
-          git config --global user.name "Adrian Martin Garcia"
           git add *
           git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+          if [ $? -eq 0 ] 
+          then 
+            echo "Commit has worked properly" 
+          else 
+            echo "Commit has not worked"
+            exit 1 
+          fi
 
           echo "Push the new branch to remote repository $AZUREREPO"
           git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+          if [ $? -eq 0 ] 
+          then 
+            echo "Push has worked properly" 
+          else 
+            echo "Push has not worked"
+            exit 1 
+          fi
 
           echo "Launched terraform commands"
           echo "terraform init"
@@ -293,106 +313,6 @@ stages:
 
           echo "Moving back to working path"
           cd ../..
-
-          echo "Logout from Azure account"
-          az logout
-
-    - task: AzureCLI@2
-      displayName: "Added user license for Azure Devops" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          #!/bin/bash   
-
-          echo "Mail has correct format"
-          if [[ ${{ parameters.option }} == infra_admin ]] || ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
-          then
-            echo "Option includes Azure Devops License addition"
-            echo "Download the $AZUREDEVOPSREPO repository"
-            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
-
-            echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
-            cd $AZUREDEVOPSREPO
-            git checkout -b $BRANCHTARGET
-
-            if [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
-            then 
-              user_mail=${{ parameters.mail }}
-              mail_int=${user_mail//#EXT#@asistemaspt.onmicrosoft.com}
-              user_mail=${mail_int/_/@}
-            else
-              user_mail=${{ parameters.mail }}
-            fi
-
-            echo "Added a new line to terraform.tfvars file at $AZUREDEVOPSREPO repository"              
-            case ${{ parameters.option }} in
-              infra_admin)
-                echo "Check that user is not currently at the group all_users"
-                mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
-                if [[ -z "$mail" ]] 
-                then 
-                  echo "Adding new user to all_users group"
-                  sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
-                  echo "User added to all_users group"
-                fi
-              ;;              
-              dplt_pipeline)
-                echo "Check that user is not currently at the group all_users"
-                mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
-                if [[ -z "$mail" ]] 
-                then 
-                  echo "Adding new user to all_users group"
-                  sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
-                  echo "User added to all_users group"
-                fi
-              ;;
-              avitech_slovakia)
-                echo "Check that user is not currently at the group all_users"
-                mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
-                if [[ -z "$mail" ]] 
-                then 
-                  echo "Adding new user to all_users group"
-                  sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
-                  echo "User added to all_users group"
-                fi
-              ;;
-              remove_user)
-                echo "Remove user from all groups"
-                sed -i "/$user_mail/d" terraform.tfvars
-                echo "User removed from all groups"
-              ;;
-              *)
-                echo "Bad option"
-              ;;
-            esac
-
-            echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
-            git config --global user.email "adrianmartin@paradigmadigital.com"
-            git config --global user.name "Adrian Martin Garcia"
-            git add *
-            git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
-              
-            echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
-            git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
-
-            echo "Launched terraform commands"
-            echo "terraform init"
-            terraform init
-            echo "terraform apply"
-            terraform apply -auto-approve
-
-          else
-            echo "Mail does not need to be added to Azure Devops"
-          fi
-
-          echo "Moving back to working path"
-          cd ..            
 
           echo "Logout from Azure account"
           az logout
@@ -410,18 +330,10 @@ stages:
         inlineScript: |
           bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
-    - task: AzureCLI@2
-      displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+    - task: CmdLine@2
+      displayName: "Waiting for nm-factory-inf-env-pro-tf pipeline to finish"
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+        script: sleep 420 #Increase this number of seconds if the nm-factory-inf-env-pro-tf pipeline needs more seconds.
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
@@ -436,6 +348,146 @@ stages:
         inlineScript: |
           bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
+    - checkout: self
+      clean: true
+
+    - task: Bash@3
+      displayName: "Checking if it is needed to add Azure license"
+      inputs:
+        targetType: inline
+        script: |
+          #!/bin/bash
+
+          echo "Checking that mail needs to have an Azure license"
+          if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]] || [[ ${{ parameters.option }} == infra_admin ]]
+          then
+            echo "Option includes Azure Devops License addition"
+          else
+            echo "Mail does not need to be added to Azure Devops"
+            exit 1
+          fi  
+
+    - task: AzureCLI@2
+      displayName: "Added user license for Azure Devops" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash   
+
+          echo "Download the $AZUREDEVOPSREPO repository"
+          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
+
+          echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
+          cd $AZUREDEVOPSREPO
+          git checkout -b $BRANCHTARGET
+
+          if [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
+          then 
+            user_mail=${{ parameters.mail }}
+            mail_int=${user_mail//#EXT#@asistemaspt.onmicrosoft.com}
+            user_mail=${mail_int/_/@}
+          else
+            user_mail=${{ parameters.mail }}
+          fi
+
+          echo "Added a new line to terraform.tfvars file at $AZUREDEVOPSREPO repository"              
+          case ${{ parameters.option }} in
+            infra_admin)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
+              fi
+            ;;              
+            dplt_pipeline)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
+              fi
+            ;;
+            avitech_slovakia)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
+              fi
+            ;;
+            remove_user)
+              echo "Remove user from all groups"
+              sed -i "/$user_mail/d" terraform.tfvars
+              echo "User removed from all groups"
+            ;;
+            *)
+              echo "Bad option"
+            ;;
+          esac
+
+          echo "Commit new branch to remote repository $AZUREDEVOPSREPO"
+          git add *
+          git commit -m "Performed the actions requested at ticket ${{ parameters.branch }}"
+          if [ $? -eq 0 ] 
+          then 
+            echo "Commit has worked properly" 
+          else 
+            echo "Commit has not worked"
+            exit 1 
+          fi
+
+          echo "Push the new branch to remote repository $AZUREDEVOPSREPO"
+          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" push origin $BRANCHTARGET
+          if [ $? -eq 0 ] 
+          then 
+            echo "Push has worked properly" 
+          else 
+            echo "Push has not worked"
+            exit 1 
+          fi
+
+          echo "Launched terraform commands"
+          echo "terraform init"
+          terraform init
+          echo "terraform apply"
+          terraform apply -auto-approve
+
+          echo "Moving back to working path"
+          cd ..            
+
+          echo "Logout from Azure account"
+          az logout
+
+    - task: AzureCLI@2
+      displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+
+    - task: CmdLine@2
+      displayName: "Waiting for nm-factory-inf-env-pro-tf pipeline to finish"
+      inputs:
+        script: sleep 420 #Increase this number of seconds if the nm-factory-inf-env-pro-tf pipeline needs more seconds.
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
@@ -448,9 +500,4 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          #!/bin/bash    
-
-          if [[ ${{ parameters.option }} == infra_admin ]] || ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]]
-          then
-            bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
-          fi
+          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}

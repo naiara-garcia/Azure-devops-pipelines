@@ -74,17 +74,6 @@ stages:
 
     - checkout: nm-factory-inf-pip-operations
 
-    - checkout: self
-      clean: true
-
-    - task: Bash@3
-      displayName: "Remove local repositories"
-      inputs:
-        targetType: inline
-        script: |
-          rm -fR nm-factory-inf-env-pro
-          rm -fR nm-factory-inf-env-azdevops
-
     - task: Bash@3
       displayName: "Checking that the mail is correct"
       inputs:
@@ -106,8 +95,8 @@ stages:
       inputs:
         targetType: inline
         script: |
-          git config --global user.email build_service@eurocontrol.com
-          git config --global user.name "Build Service" 
+          git config --global user.email dcachaza@paradigmadigital.com
+          git config --global user.name "David Cachaza Todoli" 
 
     - task: AzureCLI@2
       displayName: "Adding user to Azure AD groups" 

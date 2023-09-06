@@ -74,6 +74,9 @@ stages:
 
     - checkout: nm-factory-inf-pip-operations
 
+    - checkout: self
+      clean: true
+
     - task: Bash@3
       displayName: "Checking that the mail is correct"
       inputs:

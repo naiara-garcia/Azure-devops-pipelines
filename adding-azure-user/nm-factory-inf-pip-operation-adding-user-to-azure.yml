@@ -346,7 +346,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash nm-factory-inf-pip-operations/adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
@@ -359,7 +359,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
+          bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
     - task: Bash@3
       displayName: "Checking if it is needed to add Azure license"
@@ -510,7 +510,7 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+          bash nm-factory-inf-pip-operations/adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
@@ -523,4 +523,4 @@ stages:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}
+          bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}

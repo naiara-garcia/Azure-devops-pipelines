@@ -75,9 +75,6 @@ stages:
 
     - checkout: nm-factory-inf-pip-operations
 
-    - checkout: self
-      clean: true
-
     - task: Bash@3
       displayName: "Remove local repositories"
       inputs:
@@ -351,27 +348,6 @@ stages:
         inlineScript: |
           bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
-    - task: CmdLine@2
-      displayName: "Waiting for nm-factory-inf-env-pro-tf pipeline to finish"
-      inputs:
-        script: sleep 420 #Increase this number of seconds if the nm-factory-inf-env-pro-tf pipeline needs more seconds.
-
-    - task: AzureCLI@2
-      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
-
-    - checkout: self
-      clean: true
-
     - task: Bash@3
       displayName: "Checking if it is needed to add Azure license"
       inputs:
@@ -514,21 +490,3 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
-
-    - task: CmdLine@2
-      displayName: "Waiting for nm-factory-inf-env-pro-tf pipeline to finish"
-      inputs:
-        script: sleep 420 #Increase this number of seconds if the nm-factory-inf-env-pro-tf pipeline needs more seconds.
-
-    - task: AzureCLI@2
-      displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
-      inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}

@@ -362,7 +362,7 @@ stages:
           bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
   - job: add_user_to_azure_devops
-    condition: or(eq('${{parameters.option}}','dplt_pipeline'),eq('${{parameters.option}}','avitech_slovakia'),eq('${{parameters.option}}','remove_user'),eq('${{parameters.option}}','infra_admin'),eq('${{parameters.option}}','support_contrib'))
+    condition: or( eq('${{ parameters.option }}', 'dplt_pipeline'), eq('${{ parameters.option }}', 'avitech_slovakia'), eq('${{ parameters.option }}', 'remove_user'), eq('${{ parameters.option }}', 'infra_admin'), eq('${{ parameters.option }}', 'support_contrib') )
     variables:
     - name: BRANCHTARGET
       value: "feature/${{ parameters.branch }}"
@@ -376,6 +376,47 @@ stages:
       value: ecl-ado-notification-team
 
     steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-seed-kvt-01-tfkv'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-seed-kvt-01-tfkv'
+        SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
+        RunAsPreJob: true
+
+    - task: AzureCLI@2
+      displayName: "Install TFenv"
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+          if [ -f "/usr/local/bin/tfenv" ]; then
+            echo "[INFO] TFenv already exists"
+          else
+            git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+            sudo ln -s ~/.tfenv/bin/* /usr/local/bin
+          fi
+
+    - checkout: nm-factory-inf-pip-operations
+
+    - task: Bash@3
+      displayName: "Checking that the mail is correct"
+      inputs:
+        targetType: inline
+        script: |
+          #!/bin/bash
+
+          echo "Checking that mail address is correct"
+          if [[ ${{ parameters.mail }} =~ "@paradigmadigital.com" ]] || [[ ${{ parameters.mail }} =~ "#EXT#@asistemaspt.onmicrosoft.com" ]]
+          then
+            echo "The mail format is correct"
+          else
+            echo "The mail format is not correct"
+            exit 1
+          fi
+
     - checkout: nm-factory-inf-env-azdevops
       clean: true          
 
@@ -389,7 +430,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
-      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -501,7 +541,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
-      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -515,7 +554,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
-      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)

@@ -21,9 +21,6 @@ then
 else
   echo "Approve the PR created"
   az repos pr set-vote --org $ORGURL --id $PRID --vote approve
-
-  echo "Merging the PR with main"
-  az repos pr update --delete-source-branch --org $ORGURL --id $PRID --status completed
 fi
 
 echo "Logout from Azure account"

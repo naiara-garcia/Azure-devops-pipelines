@@ -10,6 +10,13 @@ resources:
   - repository: nm-factory-inf-pip-operations
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
+    ref: DF-740/keycloak-pipeline-update
+  - repository: nm-factory-inf-env-pro
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+  - repository: nm-factory-inf-env-azdevops
+    type: git
+    name: ecl-ado-prj-iac/nm-factory-inf-env-azdevops
 
 variables:
 - group: factory-azure-mgmt
@@ -76,14 +83,6 @@ stages:
     - checkout: nm-factory-inf-pip-operations
 
     - task: Bash@3
-      displayName: "Remove local repositories"
-      inputs:
-        targetType: inline
-        script: |
-          rm -fR nm-factory-inf-env-pro
-          rm -fR nm-factory-inf-env-azdevops
-
-    - task: Bash@3
       displayName: "Checking that the mail is correct"
       inputs:
         targetType: inline
@@ -98,6 +97,9 @@ stages:
             echo "The mail format is not correct"
             exit 1
           fi
+
+    - checkout: nm-factory-inf-env-pro
+      clean: true          
 
     - task: Bash@3
       displayName: "Config git user to proceed with commit"
@@ -120,8 +122,6 @@ stages:
         inlineScript: |
           #!/bin/bash
 
-          echo "Download the repository $AZUREREPO"
-          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREREPO
           echo "Create a new branch locally for $AZUREREPO repository"
           cd $AZUREREPO/004-aad
           git checkout -b $BRANCHTARGET
@@ -348,6 +348,19 @@ stages:
         inlineScript: |
           bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
 
+    - task: AzureCLI@2
+      displayName: "Merging with main branch at repository ${{ variables.AZUREREPO }}" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
+
     - task: Bash@3
       displayName: "Checking if it is needed to add Azure license"
       inputs:
@@ -364,6 +377,17 @@ stages:
             exit 1
           fi  
 
+    - checkout: nm-factory-inf-env-azdevops
+      clean: true          
+
+    - task: Bash@3
+      displayName: "Config git user to proceed with commit"
+      inputs:
+        targetType: inline
+        script: |
+          git config --global user.email dcachaza@paradigmadigital.com
+          git config --global user.name "David Cachaza Todoli" 
+
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
       env:
@@ -376,9 +400,6 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           #!/bin/bash   
-
-          echo "Download the $AZUREDEVOPSREPO repository"
-          git -c http.extraHeader="Authorization: bearer $(System.AccessToken)" clone https://ecl-ado-factory@dev.azure.com/ecl-ado-factory/$PROJECT/_git/$AZUREDEVOPSREPO
 
           echo "Create a new branch locally for $AZUREDEVOPSREPO repository"
           cd $AZUREDEVOPSREPO
@@ -490,3 +511,16 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           bash adding-azure-user/scripts/creating-pr.sh $(System.AccessToken) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }} ${{ variables.REVIEWERS }}
+
+    - task: AzureCLI@2
+      displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
+      env:
+        ARM_CLIENT_ID: $(terraform-app-client-id)
+        ARM_CLIENT_SECRET: $(terraform-app-secret)
+        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          bash adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREDEVOPSREPO }} ${{ parameters.branch }}

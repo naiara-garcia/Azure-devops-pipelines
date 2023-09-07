@@ -353,7 +353,7 @@ stages:
 
     - task: Bash@3
       displayName: "Config git user to proceed with commit"
-      condition: or(eq(${{ parameters.option }},dplt_pipeline),eq(${{ parameters.option }},avitech_slovakia),eq(${{ parameters.option }},remove_user),eq(${{ parameters.option }},infra_admin),eq(${{ parameters.option }},support_contrib))     
+      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       inputs:
         targetType: inline
         script: |
@@ -362,7 +362,7 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
-      condition: or(eq(${{ parameters.option }},dplt_pipeline),eq(${{ parameters.option }},avitech_slovakia),eq(${{ parameters.option }},remove_user),eq(${{ parameters.option }},infra_admin),eq(${{ parameters.option }},support_contrib))     
+      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -474,7 +474,7 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
-      condition: or(eq(${{ parameters.option }},dplt_pipeline),eq(${{ parameters.option }},avitech_slovakia),eq(${{ parameters.option }},remove_user),eq(${{ parameters.option }},infra_admin),eq(${{ parameters.option }},support_contrib))     
+      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -501,7 +501,7 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
-      condition: or(eq(${{ parameters.option }},dplt_pipeline),eq(${{ parameters.option }},avitech_slovakia),eq(${{ parameters.option }},remove_user),eq(${{ parameters.option }},infra_admin),eq(${{ parameters.option }},support_contrib))     
+      condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)

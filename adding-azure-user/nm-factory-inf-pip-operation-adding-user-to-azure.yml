@@ -360,7 +360,7 @@ stages:
             git config --global user.email dcachaza@paradigmadigital.com
             git config --global user.name "David Cachaza Todoli" 
 
-    - ${{ if or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib')) }}:
+    - ${{ if or(eq('${{parameters.option}}','dplt_pipeline'),eq('${{parameters.option}}','avitech_slovakia'),eq('${{parameters.option}}','remove_user'),eq('${{'${{parameters.option}}'}}','infra_admin'),eq('${{parameters.option}}','support_contrib')) }}:
       - task: AzureCLI@2
         displayName: "Added user license for Azure Devops" 
         condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
@@ -473,7 +473,7 @@ stages:
             echo "Logout from Azure account"
             az logout
 
-    - ${{ if or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib')) }}:
+    - ${{ if or(eq('${{parameters.option}}','dplt_pipeline'),eq('${{parameters.option}}','avitech_slovakia'),eq('${{parameters.option}}','remove_user'),eq('${{'${{parameters.option}}'}}','infra_admin'),eq('${{parameters.option}}','support_contrib')) }}:
       - task: AzureCLI@2
         displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
         condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     
@@ -501,7 +501,7 @@ stages:
         inlineScript: |
           bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
-    - ${{ if or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib')) }}:
+    - ${{ if or(eq('${{parameters.option}}','dplt_pipeline'),eq('${{parameters.option}}','avitech_slovakia'),eq('${{parameters.option}}','remove_user'),eq('${{'${{parameters.option}}'}}','infra_admin'),eq('${{parameters.option}}','support_contrib')) }}:
       - task: AzureCLI@2
         displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
         condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))     

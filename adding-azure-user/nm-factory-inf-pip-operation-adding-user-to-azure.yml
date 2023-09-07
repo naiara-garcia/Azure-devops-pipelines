@@ -361,7 +361,6 @@ stages:
         inlineScript: |
           bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
-  jobs:
   - job: add_user_to_azure_devops
     condition: or(eq(parameters.option,'dplt_pipeline'),eq(parameters.option,'avitech_slovakia'),eq(parameters.option,'remove_user'),eq(parameters.option,'infra_admin'),eq(parameters.option,'support_contrib'))
     variables:

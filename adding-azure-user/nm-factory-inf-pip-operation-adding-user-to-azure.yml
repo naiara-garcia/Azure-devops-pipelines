@@ -27,6 +27,7 @@ parameters:
   - dplt_pipeline
   - dplt_developer
   - infra_admin
+  - support_contrib
   - remove_user
 - name: branch
   displayName: Ticket Number
@@ -285,6 +286,15 @@ stages:
                 echo "User added to infra_admin groups"
               fi       
             ;;
+            support_contrib)
+              echo "Check that user is not currently at the Support Contributor Azure Group"
+              mail=`sed -n '/^ /,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to Support Contributor Azure Group"
+                sed -i "/group_azdevops_support_contrib_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+              fi          
+            ;;
             remove_user)
               echo "Remove user from all groups"
               sed -i "/${{ parameters.mail }}/d" terraform.tfvars
@@ -370,7 +380,7 @@ stages:
           #!/bin/bash
 
           echo "Checking that mail needs to have an Azure license"
-          if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]] || [[ ${{ parameters.option }} == infra_admin ]]
+          if [[ ${{ parameters.option }} == dplt_pipeline ]] || [[ ${{ parameters.option }} == avitech_slovakia ]] || [[ ${{ parameters.option }} == remove_user ]] || [[ ${{ parameters.option }} == infra_admin ]] || [[ ${{ parameters.option }} == support_contrib ]]
           then
             echo "Option includes Azure Devops License addition"
           else
@@ -430,6 +440,16 @@ stages:
               fi
             ;;
             avitech_slovakia)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
+              fi
+            ;;
+            support_contrib)
               echo "Check that user is not currently at the group all_users"
               mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
               if [[ -z "$mail" ]] 

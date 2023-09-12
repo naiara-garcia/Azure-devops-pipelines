@@ -21,6 +21,14 @@ resources:
   - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
+
+variables:
+- name: azSubscription
+  value: ecl-az-fact-svc-01-armconnection
+- name: azKeyVaultNameTerraform
+  value: ecl-az-seed-kvt-01-tfkv
+- name: azTenantId
+  value: 9e296acd-1e44-44f0-8c77-cc9dbce85489
         
 stages:
 - stage: recreate_jenkins_agent_vm 
@@ -31,22 +39,33 @@ stages:
     - checkout: nm-factory-inf-env-pro
 
     - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault: ecl-az-seed-kvt-01-tfkv'
+      displayName: 'Azure Key Vault: ${{ variables.azKeyVaultNameTerraform }}'
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        KeyVaultName: 'ecl-az-seed-kvt-01-tfkv'
+        azureSubscription: ${{ variables.azSubscription }}
+        KeyVaultName: ${{ variables.azKeyVaultNameTerraform }}
         SecretsFilter: 'terraform-app-client-id, terraform-app-secret'
         RunAsPreJob: true
 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-      displayName: 'Install Terraform 1.3.0'
+    - task: AzureCLI@2
+      displayName: "Install TFenv"
+      condition: succeeded()
       inputs:
-        terraformVersion: 1.3.0
+        azureSubscription: ${{ variables.azSubscription }}
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          #!/bin/bash
+          if [ -f "/usr/local/bin/tfenv" ]; then
+            echo "[INFO] TFenv already exists"
+          else
+            git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+            sudo ln -s ~/.tfenv/bin/* /usr/local/bin
+          fi
 
     - task: AzureCLI@2
       displayName: 'Install SSH Keys'
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        azureSubscription: ${{ variables.azSubscription }}
         scriptType: bash
         scriptPath: '$(System.DefaultWorkingDirectory)/nm-factory-inf-pip-terraform/bash/az_ssh_install.sh'
         
@@ -55,9 +74,9 @@ stages:
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyValut or inside provider.tf
+        ARM_TENANT_ID: ${{ variables.azTenantId }}  #Must move to KeyValut or inside provider.tf
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        azureSubscription: ${{ variables.azSubscription }}
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |

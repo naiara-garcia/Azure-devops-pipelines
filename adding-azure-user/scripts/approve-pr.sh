@@ -17,13 +17,10 @@ PRID=`az repos pr list --org $ORGURL -p $PROJECT -r $REPO -s $BRANCHTARGET | gre
 if [[ -z "$PRID" ]]
 then
   echo "PR does not exist"
-
+  exit 1
 else
   echo "Approve the PR created"
   az repos pr set-vote --org $ORGURL --id $PRID --vote approve
-
-  echo "Merging the PR with main"
-  az repos pr update --org $ORGURL --id $PRID --status completed
 fi
 
 echo "Logout from Azure account"

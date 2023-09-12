@@ -2,7 +2,7 @@
     
 #Login to keycloak
 
-KEYCLOAK_URL=https://keycloak-factory.dplt.dev/auth
+KEYCLOAK_URL=https://keycloak-factory-dev.dplt.dev/auth
 KEYCLOAK_REALM=master
 KEYCLOAK_CLIENT=admin-cli
 KEYCLOAK_USER=admin

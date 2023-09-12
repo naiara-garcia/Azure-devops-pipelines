@@ -10,7 +10,6 @@ resources:
   - repository: nm-factory-inf-pip-operations
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-pip-operations
-    ref: DF-740/keycloak-pipeline-update
   - repository: nm-factory-inf-env-pro
     type: git
     name: ecl-ado-prj-iac/nm-factory-inf-env-pro
@@ -49,8 +48,6 @@ stages:
       value: "feature/${{ parameters.branch }}"
     - name: AZUREREPO
       value: "nm-factory-inf-env-pro"
-    - name: AZUREDEVOPSREPO
-      value: "nm-factory-inf-env-azdevops"
     - name: PROJECT
       value: "ecl-ado-prj-iac"
     - name: REVIEWERS
@@ -366,8 +363,6 @@ stages:
     variables:
     - name: BRANCHTARGET
       value: "feature/${{ parameters.branch }}"
-    - name: AZUREREPO
-      value: "nm-factory-inf-env-pro"
     - name: AZUREDEVOPSREPO
       value: "nm-factory-inf-env-azdevops"
     - name: PROJECT

@@ -359,7 +359,7 @@ stages:
           bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
   - job: add_user_to_azure_devops
-    condition: ${{ notIn( '${{parameters.option}}', 'dpro_developer', 'dplt_developer') }}
+    condition: notIn( '${{parameters.option}}', 'dpro_developer', 'dplt_developer')
     variables:
     - name: BRANCHTARGET
       value: "feature/${{ parameters.branch }}"

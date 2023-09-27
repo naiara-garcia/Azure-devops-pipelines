@@ -76,9 +76,9 @@ stages:
               script: |
                 #!/bin/bash
 
-                chmod +x keycloak-user-creation.sh
+                chmod +x ./Keycloak/keycloak-user-creation.sh
 
-                docker run --entrypoint `pwd`/keycloak-user-creation.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} $(firstname) $(lastname) $(azuserid)
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-creation.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} $(firstname) $(lastname) $(azuserid)
 
           - task: Bash@3
             displayName: "Adding/removing user at Keycloak groups"
@@ -87,9 +87,9 @@ stages:
               script: |
                 #!/bin/bash
 
-                chmod +x keycloak-user-mgmt.sh
+                chmod +x ./Keycloak/keycloak-user-mgmt.sh
 
-                docker run --entrypoint `pwd`/keycloak-user-mgmt.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} ${{ parameters.mail }} $(password)
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} ${{ parameters.mail }} $(password)
 
           - task: Bash@3
             displayName: "Removing user at Keycloak"
@@ -99,6 +99,6 @@ stages:
               script: |
                 #!/bin/bash
 
-                chmod +x keycloak-user-deletion.sh
+                chmod +x ./Keycloak/keycloak-user-deletion.sh
 
-                docker run --entrypoint `pwd`/keycloak-user-deletion.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} ${{ parameters.mail }} $(password)
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-deletion.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} ${{ parameters.mail }} $(password)

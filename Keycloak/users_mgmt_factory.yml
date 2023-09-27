@@ -7,7 +7,7 @@ pool:
   name: Factory-VSS-Agents
 
 variables:
-  - group: factory-dev-keycloak-user-mgmt
+  - group: factory-keycloak-user-mgmt
   - name: keycloak_hostname
     value: keycloak-factory.dplt.dev
     readonly: true

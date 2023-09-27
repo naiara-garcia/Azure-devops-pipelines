@@ -28,7 +28,9 @@ kcuserid=`/opt/keycloak/bin/kcadm.sh get users --server $KEYCLOAK_URL --realm $K
 if [[ -z "$kcuserid" ]]; then
     # Creating user
     echo "Creating user"
-    echo `/opt/keycloak/bin/kcadm.sh create users --server $KEYCLOAK_URL -s email=$USER_EMAIL -s username=$USER_EMAIL -s firstName=$USER_FISTNAME -s lastName=$USER_LASTNAME -s enabled=true --realm $KEYCLOAK_USER_REALM --token $ACCESS_TOKEN`
+    /opt/keycloak/bin/kcadm.sh create users --server $KEYCLOAK_URL -s email=$USER_EMAIL -s username=$USER_EMAIL -s firstName=$USER_FISTNAME -s lastName=$USER_LASTNAME -s enabled=true --realm $KEYCLOAK_USER_REALM --token $ACCESS_TOKEN
+
+    kcuserid=`/opt/keycloak/bin/kcadm.sh get users --server $KEYCLOAK_URL --realm $KEYCLOAK_USER_REALM --token $ACCESS_TOKEN -q email=$USER_EMAIL | grep id | awk '{print $3}' | awk -F'"' '{print $2}'`
 
     #Linking with Azure AD
     echo "Linking with Azure AD"

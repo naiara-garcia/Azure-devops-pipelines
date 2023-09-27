@@ -87,9 +87,9 @@ stages:
               script: |
                 #!/bin/bash
 
-                chmod +x ./Keycloak/keycloak-user-mgmt.sh
+                chmod +x ./Keycloak/keycloak-user-mgmt-dev.sh
 
-                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.option }}
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt-dev.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.option }}
 
           - task: Bash@3
             displayName: "Removing user at Keycloak"

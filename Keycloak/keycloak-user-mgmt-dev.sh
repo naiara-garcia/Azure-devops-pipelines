@@ -29,7 +29,7 @@ echo $kcuserid
 case $OPTION in
     dpro_developer)
         #Adding user to dpro_developer groups
-        groups_id='d3e9bc67-b197-4f54-874c-32667d63eff3'
+        groups_id='7050adbd-d402-41a1-92da-884e9e2e569e'
 
         echo $groups_id
 
@@ -43,7 +43,7 @@ case $OPTION in
     ;;
     dplt_pipeline)
         #Adding user to dplt_pipeline groups
-        groups_id='19163472-53f9-4c54-89cd-54073b7dded0 7f1efdb1-dbc1-413a-8c20-f82034273cef f8612ce9-af5e-4ee5-a509-4f7b3573d8f2'
+        groups_id='5be0dbc0-6ace-49c4-89dc-1a2ddfad186e 6a49503e-3757-4bc1-bae8-ac9d0cfa0036 c8119fa8-0a0d-405d-9e2e-16630ad9d3b8'
 
         echo $groups_id
 
@@ -57,7 +57,7 @@ case $OPTION in
     ;;
     dplt_developer)
         #Adding user to dplt_developer groups
-        groups_id='cb0359b0-5b79-4614-8e3d-bed79fea224d f8612ce9-af5e-4ee5-a509-4f7b3573d8f2'
+        groups_id='0b637195-305b-434c-9672-e26831846487 c8119fa8-0a0d-405d-9e2e-16630ad9d3b8'
 
         echo $groups_id
 
@@ -71,7 +71,7 @@ case $OPTION in
     ;;
     infra_admin)
         #Adding user to infra_admin groups
-        groups_id='e9d185ea-f0a3-4229-8483-b4f281d4b5c5 f41ec15a-095c-417d-a33e-e044d18a05e7 013a8512-b75b-4c54-b5ec-bfc4de4d1708 ad0e465b-72c4-4336-8e1e-45fac25863f9'
+        groups_id='887b69df-b9a3-4543-818c-bd06458e3322 357526b3-7ff8-4e2d-8b83-aa3b31c92909 caf82e4a-c8fe-49c9-8ecb-461135326aca 9cb95afe-44f3-4484-bedd-4ad4868e27f6'
 
         echo $groups_id
 

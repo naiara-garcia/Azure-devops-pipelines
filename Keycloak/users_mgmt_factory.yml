@@ -1,34 +1,104 @@
+name: nm-factory-inf-mod-keycloak-user-mgmt
+
 trigger: none
 pr: none
 
+pool:
+  name: Factory-VSS-Agents
 
 variables:
-- group: factory-keycloak-user-mgmt
+  - group: factory-keycloak-user-mgmt
+  - name: keycloak_hostname
+    value: keycloak-factory.dplt.dev
+    readonly: true
+  - name: user_realm
+    value: factory
+    readonly: true
 
 parameters:
-- name: mail
-  displayName: User Email
-  type: string
-- name: option
-  displayName: Group Option
-  type: string
-  values: 
-  - dpro_developer
-  - dplt_pipeline
-  - dplt_developer
-  - infra_admin
-  - remove_user
+  - name: mail
+    displayName: User Email
+    type: string
+  - name: option
+    displayName: Group Option
+    type: string
+    values:
+      - dpro_developer
+      - dplt_pipeline
+      - dplt_developer
+      - infra_admin
+      - remove_user
 
-jobs:
-- job: ManageUsers
-  workspace:
-    clean: all
-  pool:
-    name: Factory-VSS-Agents
-  steps:
-  - script: |
-      chmod +x ./Keycloak/keycloak-user-mgmt-factory.sh
+stages:
+  - stage: Manage_Keycloak_Users
+    jobs:
+      - job: managing_keycloak_users
 
-      docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt-factory.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ parameters.mail}} ${{ parameters.option}} $(password)
+        steps:
+          - task: AzureKeyVault@2
+            displayName: "Azure Key Vault: ecl-az-seed-kvt-01-tfkv"
+            inputs:
+              azureSubscription: "ecl-az-fact-svc-01-armconnection"
+              KeyVaultName: "ecl-az-seed-kvt-01-tfkv"
+              SecretsFilter: "terraform-app-client-id, terraform-app-secret"
+              RunAsPreJob: true
 
-      echo "Execution finished"
+          - task: AzureCLI@2
+            displayName: "Getting the username of the Azure Active Directory user"
+            condition: notIn( '${{parameters.option}}', 'remove_user')
+            env:
+              ARM_CLIENT_ID: $(terraform-app-client-id)
+              ARM_CLIENT_SECRET: $(terraform-app-secret)
+              ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489" #Must move to KeyVault or inside provider.tf
+            inputs:
+              azureSubscription: "ecl-az-fact-svc-01-armconnection"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                #!/bin/bash
+
+                user_data=`az ad user show --id "jhernantes@paradigmadigital.com"`
+                name=(`echo "$user_data" | grep displayName | cut -d':' -f2 | awk -F'"' '{print $2}'`)
+                firstname=${name[0]}
+                lastname=${name[1]}
+                azuserid=$(echo $user_data | grep id | cut -d':' -f7 | awk -F'"' '{print $2}')  
+
+                echo "##vso[task.setvariable variable=firstname]$firstname" 
+                echo "##vso[task.setvariable variable=lastname]$lastname"    
+                echo "##vso[task.setvariable variable=azuserid]$azuserid" 
+
+          - task: Bash@3
+            displayName: "Creating user at Keycloak"
+            condition: notIn( '${{parameters.option}}', 'remove_user')
+            inputs:
+              targetType: inline
+              script: |
+                #!/bin/bash
+
+                chmod +x ./Keycloak/keycloak-user-creation.sh
+
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-creation.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} $(firstname) $(lastname) $(azuserid)
+
+          - task: Bash@3
+            displayName: "Modifying user at Keycloak groups"
+            condition: notIn( '${{parameters.option}}', 'remove_user')
+            inputs:
+              targetType: inline
+              script: |
+                #!/bin/bash
+
+                chmod +x ./Keycloak/keycloak-user-mgmt.sh
+
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.option }}
+
+          - task: Bash@3
+            displayName: "Removing user at Keycloak"
+            condition: in( '${{parameters.option}}', 'remove_user')
+            inputs:
+              targetType: inline
+              script: |
+                #!/bin/bash
+
+                chmod +x ./Keycloak/keycloak-user-deletion.sh
+
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-deletion.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }}

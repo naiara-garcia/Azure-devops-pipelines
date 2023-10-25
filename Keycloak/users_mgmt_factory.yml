@@ -57,7 +57,7 @@ stages:
               inlineScript: |
                 #!/bin/bash
 
-                user_data=`az ad user show --id "jhernantes@paradigmadigital.com"`
+                user_data=`az ad user show --id "${{ parameters.mail }}"`
                 name=(`echo "$user_data" | grep displayName | cut -d':' -f2 | awk -F'"' '{print $2}'`)
                 firstname=${name[0]}
                 lastname=${name[1]}

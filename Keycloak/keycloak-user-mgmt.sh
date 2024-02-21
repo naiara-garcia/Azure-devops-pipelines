@@ -101,6 +101,24 @@ case $OPTION in
         done
         echo "User successfully added to infra_admin groups"
     ;;
+    avitech_slovakia)
+        #Adding user to avitech_slovakia groups
+
+        #Keycloak group ID -> Keycloak group name
+        #d3e9bc67-b197-4f54-874c-32667d63eff3 -> dpro_jenkins_developers
+        #f8612ce9-af5e-4ee5-a509-4f7b3573d8f2 -> nx-readonly
+        groups_id='d3e9bc67-b197-4f54-874c-32667d63eff3 f8612ce9-af5e-4ee5-a509-4f7b3573d8f2'
+
+        echo $groups_id
+
+        IFS=$' '
+        groups=($groups_id)
+
+        for (( i=0; i<${#groups[@]}; i++ )); do
+            /opt/keycloak/bin/kcadm.sh update users/$kcuserid/groups/${groups[$i]} -r $KEYCLOAK_USER_REALM -s realm=$KEYCLOAK_USER_REALM -s userId=$kcuserid -s groupId=${groups[$i]} -n --server $KEYCLOAK_URL --token $ACCESS_TOKEN
+        done
+        echo "User successfully added to avitech_slovakia groups"
+    ;;
     remove_user)
         #Removing user from groups
         groups_id=`/opt/keycloak/bin/kcadm.sh get users/$kcuserid/groups -r $KEYCLOAK_USER_REALM --server $KEYCLOAK_URL --token $ACCESS_TOKEN | grep id | awk '{print $3}' | awk -F'"' '{print $2}'`

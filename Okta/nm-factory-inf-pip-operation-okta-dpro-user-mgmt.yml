@@ -83,7 +83,7 @@ stages:
         OKTA_TOKEN: $(okta-token)
 
   - job: adding_user_to_groups
-    condition: In( ${{parameters.option}}, 'create_user', 'update_user')
+    condition: not( ${{ eq(parameters.option, 'delete_user') }} )
     dependsOn: create_okta_user
     steps:
     - task: AzureKeyVault@2

@@ -1,0 +1,262 @@
+name: nm-factory-inf-pip-operation-okta-dpro-user-mgmt
+
+trigger: none # will disable CI builds entirely
+ 
+pool:
+  name: Factory-VSS-Agents
+
+parameters:
+- name: firstName
+  displayName: First Name
+  type: string
+
+- name: lastName
+  displayName: Last Name
+  type: string
+
+- name: email
+  displayName: Email
+  type: string
+
+- name: dproGroup
+  displayName: Okta DPRO Group
+  type: string
+  values:
+    - 1c,2c
+    - 1c,2c,3c
+
+- name: option
+  displayName: Option
+  type: string
+  values:
+    - create_user
+    - update_user
+    - delete_user
+
+variables:
+- name: oktaDomain
+  value: "iam-nm-dev-dpro-admin.okta.com"
+
+stages:
+- stage: okta_user_management
+  jobs:
+  - job: create_okta_user
+    condition: ${{ eq(parameters.option, 'create_user') }}
+    steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-fact-kvt-01-main'
+        SecretsFilter: 'okta-token'
+        RunAsPreJob: true                
+
+    - task: Bash@3
+      displayName: 'Creation of the user'
+      inputs:
+        targetType: 'inline'
+        failOnStderr: true
+        script: |
+          echo "Create variable with all groups needed"
+          if [[ ${{parameters.dproGroup}} == "1c,2c" ]]; then
+             list_group=("dprodev1c_dplt_administrator"               "dprodev1c_plop_full_write"                 "dprodev1c_plop_full_read" "dprodev1c_po_full_write" "dprodev1c_po_full_read" "dprodev1c_po_product_read" "dprodev1c_po_product_write" "dprodev2c_dplt_administrator"               "dprodev2c_plop_full_write"                 "dprodev2c_plop_full_read" "dprodev2c_po_full_write" "dprodev2c_po_full_read" "dprodev2c_po_product_read" "dprodev2c_po_product_write")
+          elif [[ ${{parameters.dproGroup}} == "1c,2c,3c" ]]; then
+             list_group=("dprodev1c_dplt_administrator"               "dprodev1c_plop_full_write"                 "dprodev1c_plop_full_read" "dprodev1c_po_full_write" "dprodev1c_po_full_read" "dprodev1c_po_product_read" "dprodev1c_po_product_write" "dprodev2c_dplt_administrator"               "dprodev2c_plop_full_write"                 "dprodev2c_plop_full_read" "dprodev2c_po_full_write" "dprodev2c_po_full_read" "dprodev2c_po_product_read" "dprodev2c_po_product_write" "dprodev3c_dplt_administrator"               "dprodev3c_plop_full_write"                 "dprodev3c_plop_full_read" "dprodev3c_po_full_write" "dprodev3c_po_full_read" "dprodev3c_po_product_read" "dprodev3c_po_product_write")
+          else
+             echo "Bad dpro group option"
+             exit -1
+          fi
+
+          echo "Get group ids from all the groups at which the user will be added"
+          for i in ${!list_group[@]}; do
+            new=$(curl -XGET \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: SSWS $api_token" \
+            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+            if [[ -z $new ]]
+            then
+              echo "The group ${list_group[$i]} does not exist"
+            else
+              listid_group[$i]=$new
+            fi
+          done
+
+          echo "Creating user and sending activation mail"
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -d '{
+            "profile": {
+              "firstName": "'"${{parameters.firstName}}"'",
+              "lastName": "'"${{parameters.lastName}}"'",
+              "email": "'"${{parameters.email}}"'",
+              "login": "'"${{parameters.email}}"'"
+            }
+          }' "https://${{variables.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+
+          cat resp.json
+          http_code=$(jq .http_code resp.json | tr -d '"') 
+
+          if [[ $http_code -ge 400 ]]; then
+            echo "Operation Failed, the user has not been created"
+            exit -1
+          else
+            echo "User created successfully"
+          fi
+
+          echo "Get the ID of the new created user"
+          userId=$(curl -X GET \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+
+          echo "Adding the user to the groups"
+          for i in ${!listid_group[@]}; do
+            curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: SSWS ${OKTA_TOKEN}" \
+            "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
+            if [[ $http_code -eq 204 ]]; then
+              echo "User successfully added to ${listid_group[$i]} group"
+            elif [[ $http_code -eq 200 ]]; then
+              echo "User was already added to ${listid_group[$i]} group"
+            else
+              echo "User has not been added to ${listid_group[$i]} group"
+              exit -1
+            fi
+          done
+
+      env:
+        OKTA_TOKEN: $(okta-token)
+
+  - job: update_okta_user
+    condition: ${{ eq(parameters.option, 'update_user') }}
+    steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-fact-kvt-01-main'
+        SecretsFilter: 'okta-token'
+        RunAsPreJob: true     
+
+    - task: Bash@3
+      displayName: 'Updating user'
+      inputs:
+        targetType: 'inline'
+        failOnStderr: true
+        script: |   
+          echo "Create variable with all groups needed"
+          if [[ ${{parameters.dproGroup}} == "1c,2c" ]]; then
+             list_group=("dprodev1c_dplt_administrator"               "dprodev1c_plop_full_write"                 "dprodev1c_plop_full_read" "dprodev1c_po_full_write" "dprodev1c_po_full_read" "dprodev1c_po_product_read" "dprodev1c_po_product_write" "dprodev2c_dplt_administrator"               "dprodev2c_plop_full_write"                 "dprodev2c_plop_full_read" "dprodev2c_po_full_write" "dprodev2c_po_full_read" "dprodev2c_po_product_read" "dprodev2c_po_product_write")
+          elif [[ ${{parameters.dproGroup}} == "1c,2c,3c" ]]; then
+             list_group=("dprodev1c_dplt_administrator"               "dprodev1c_plop_full_write"                 "dprodev1c_plop_full_read" "dprodev1c_po_full_write" "dprodev1c_po_full_read" "dprodev1c_po_product_read" "dprodev1c_po_product_write" "dprodev2c_dplt_administrator"               "dprodev2c_plop_full_write"                 "dprodev2c_plop_full_read" "dprodev2c_po_full_write" "dprodev2c_po_full_read" "dprodev2c_po_product_read" "dprodev2c_po_product_write" "dprodev3c_dplt_administrator"               "dprodev3c_plop_full_write"                 "dprodev3c_plop_full_read" "dprodev3c_po_full_write" "dprodev3c_po_full_read" "dprodev3c_po_product_read" "dprodev3c_po_product_write")
+          else
+             echo "Bad dpro group option"
+             exit -1
+          fi
+
+          echo "Get group ids from all the groups at which the user will be added"
+          for i in ${!list_group[@]}; do
+            URL="$okta_domain/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22"
+            new=$(curl -XGET \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: SSWS $api_token" \
+            "$URL" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+            if [[ -z $new ]]
+            then
+              echo "The group ${list_group[$i]} does not exist"
+            else
+              listid_group[$i]=$new
+            fi
+          done
+
+          echo "Get the user ID"
+          userId=$(curl -X GET \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS $api_token" \
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')    
+
+          echo "Adding the user to the groups"
+          for i in ${!listid_group[@]}; do
+            curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: SSWS ${OKTA_TOKEN}" \
+            "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
+            if [[ $http_code -eq 204 ]]; then
+              echo "User successfully added to ${listid_group[$i]} group"
+            elif [[ $http_code -eq 200 ]]; then
+              echo "User was already added to ${listid_group[$i]} group"
+            else
+              echo "User has not been added to ${listid_group[$i]} group"
+              exit -1
+            fi
+          done
+
+  - job: delete_okta_user
+    condition: ${{ eq(parameters.option, 'delete_user') }}
+    steps:
+    - task: AzureKeyVault@2
+      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      inputs:
+        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        KeyVaultName: 'ecl-az-fact-kvt-01-main'
+        SecretsFilter: 'okta-token'
+        RunAsPreJob: true     
+
+    - task: Bash@3
+      displayName: 'Deleting user'
+      inputs:
+        targetType: 'inline'
+        failOnStderr: true
+        script: |
+          echo "Getting user id for ${{parameters.email}}."
+          userId=$(curl -X GET \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+          if [[ -z userId ]]; then
+            echo "User does not exist"
+            exit -1
+          else
+            echo "User successfully loaded"
+          fi
+
+          echo "Deactivating the user before deleting it"
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          "https://${{variables.oktaDomain}}/api/v1/users/$userId/lifecycle/deactivate?sendEmail=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+
+          http_code=$(jq .http_code resp.json | tr -d '"') 
+          if [[ $http_code -ge 400 ]]; then
+            echo "Operation Failed, the user has not been deactivated"
+            exit -1
+          else
+            echo "User deactivated successfully"
+          fi
+
+          echo "Deleting the user"
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          "https://${{variables.oktaDomain}}/api/v1/users/$userId?sendEmail=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+          http_code=$(jq .http_code resp.json | tr -d '"') 
+          if [[ $http_code -ge 400 ]]; then
+            echo "Operation Failed, the user has not been deleted"
+            exit -1
+          else
+            echo "User deleted successfully"
+          fi
+      env:
+        OKTA_TOKEN: $(okta-token)

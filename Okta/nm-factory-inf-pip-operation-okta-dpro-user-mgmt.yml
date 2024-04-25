@@ -152,18 +152,6 @@ stages:
              exit -1
           fi
 
-          curl -XGET \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22dprodev1c_dplt_administrator%22" | jq
-
-          curl -XGET \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22dprodev1c_dplt_administrator%22" | jq -r '.[].id'
-
           echo "Get group ids from all the groups at which the user will be added"
           for i in ${!list_group[@]}; do
             listid_group[$i]=$(curl -XGET \
@@ -173,11 +161,6 @@ stages:
             "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq -r '.[].id')
           done
 
-          echo "Showing the group ids:"
-          for str in ${listid_group[@]}; do
-            echo $str
-          done
-
           echo "Get the user ID"
           userId=$(curl -X GET \
           -H "Accept: application/json" \
@@ -185,7 +168,11 @@ stages:
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')    
 
-          echo "User id is $userId"
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: SSWS ${OKTA_TOKEN}" \
+            "https://${{variables.oktaDomain}}/api/v1/groups/00gbulnxdyVWMAAR8417/users/$userId"
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do

@@ -105,7 +105,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | | jq '.[] | .id' | tr -d '"')
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq '.[] | .id' | tr -d '"')
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do
@@ -168,7 +168,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS $api_token" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | | jq '.[] | .id' | tr -d '"')    
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq '.[] | .id' | tr -d '"')    
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do

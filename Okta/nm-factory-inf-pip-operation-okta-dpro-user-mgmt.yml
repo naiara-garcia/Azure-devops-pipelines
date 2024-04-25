@@ -55,7 +55,6 @@ stages:
       displayName: 'Creation of the user'
       inputs:
         targetType: 'inline'
-        failOnStderr: true
         script: |
           echo "Create variable with all groups needed"
           if [[ ${{parameters.dproGroup}} == "1c,2c" ]]; then
@@ -142,7 +141,6 @@ stages:
       displayName: 'Updating user'
       inputs:
         targetType: 'inline'
-        failOnStderr: true
         script: |   
           echo "Create variable with all groups needed"
           if [[ ${{parameters.dproGroup}} == "1c,2c" ]]; then
@@ -159,7 +157,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS 00qrFeDs8-g_Sql4QBXwWXPo_LivHGS7ezuW3Y1ktA" \
-          "https://iam-nm-dev-dpro-admin.okta.com/api/v1/users?search=profile.email+eq+%22naigarcia@eservicios.indra.es%22" | jq 
+          "https://iam-nm-dev-dpro-admin.okta.com/api/v1/users?search=profile.email+eq+%22naigarcia@eservicios.indra.es%22" | jq -r '.[].id'
 #
           #echo "Get group ids from all the groups at which the user will be added"
           #for i in ${!list_group[@]}; do
@@ -210,7 +208,6 @@ stages:
       displayName: 'Deleting user'
       inputs:
         targetType: 'inline'
-        failOnStderr: true
         script: |
           echo "Getting user id for ${{parameters.email}}."
           userId=$(curl -X GET \

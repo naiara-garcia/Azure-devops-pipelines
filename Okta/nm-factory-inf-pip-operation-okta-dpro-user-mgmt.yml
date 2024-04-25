@@ -122,7 +122,6 @@ stages:
               exit -1
             fi
           done
-          exit 0
       env:
         OKTA_TOKEN: $(okta-token)
 
@@ -168,12 +167,6 @@ stages:
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')    
 
-          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
-            "https://${{variables.oktaDomain}}/api/v1/groups/00gbulnxdyVWMAAR8417/users/$userId"
-
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do
             curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
@@ -181,16 +174,13 @@ stages:
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS ${OKTA_TOKEN}" \
             "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
-            if [[ $http_code -eq 204 ]]; then
-              echo "User successfully added to ${list_group[$i]} group"
-            elif [[ $http_code -eq 200 ]]; then
-              echo "User was already added to ${list_group[$i]} group"
-            else
+            if [[ $http_code -ge 400 ]]; then
               echo "User has not been added to ${list_group[$i]} group"
               exit -1
+            else
+              echo "User successfully added to ${list_group[$i]} group"
             fi
           done
-          exit 0
       env:
         OKTA_TOKEN: $(okta-token)          
 
@@ -251,6 +241,5 @@ stages:
           else
             echo "User deleted successfully"
           fi
-          exit 0
       env:
         OKTA_TOKEN: $(okta-token)

@@ -73,7 +73,7 @@ stages:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS $api_token" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.[] | .id' | tr -d '"')
           done
 
           echo "Creating user and sending activation mail"
@@ -105,7 +105,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | | jq '.[] | .id' | tr -d '"')
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do
@@ -123,7 +123,7 @@ stages:
               exit -1
             fi
           done
-
+          exit 0
       env:
         OKTA_TOKEN: $(okta-token)
 
@@ -160,7 +160,7 @@ stages:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS $api_token" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.[] | .id' | tr -d '"')
           done
 
           echo "Get the user ID"
@@ -168,7 +168,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS $api_token" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')    
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | | jq '.[] | .id' | tr -d '"')    
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do
@@ -186,6 +186,7 @@ stages:
               exit -1
             fi
           done
+          exit 0
 
   - job: delete_okta_user
     condition: ${{ eq(parameters.option, 'delete_user') }}
@@ -245,5 +246,6 @@ stages:
           else
             echo "User deleted successfully"
           fi
+          exit 0
       env:
         OKTA_TOKEN: $(okta-token)

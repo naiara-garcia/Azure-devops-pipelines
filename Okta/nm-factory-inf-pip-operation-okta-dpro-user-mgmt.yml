@@ -69,17 +69,11 @@ stages:
 
           echo "Get group ids from all the groups at which the user will be added"
           for i in ${!list_group[@]}; do
-            new=$(curl -XGET \
+            listid_group[$i]=$(curl -XGET \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS $api_token" \
             "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
-            if [[ -z $new ]]
-            then
-              echo "The group ${list_group[$i]} does not exist"
-            else
-              listid_group[$i]=$new
-            fi
           done
 
           echo "Creating user and sending activation mail"
@@ -121,11 +115,11 @@ stages:
             -H "Authorization: SSWS ${OKTA_TOKEN}" \
             "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
             if [[ $http_code -eq 204 ]]; then
-              echo "User successfully added to ${listid_group[$i]} group"
+              echo "User successfully added to ${list_group[$i]} group"
             elif [[ $http_code -eq 200 ]]; then
-              echo "User was already added to ${listid_group[$i]} group"
+              echo "User was already added to ${list_group[$i]} group"
             else
-              echo "User has not been added to ${listid_group[$i]} group"
+              echo "User has not been added to ${list_group[$i]} group"
               exit -1
             fi
           done
@@ -162,18 +156,11 @@ stages:
 
           echo "Get group ids from all the groups at which the user will be added"
           for i in ${!list_group[@]}; do
-            URL="$okta_domain/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22"
-            new=$(curl -XGET \
+            listid_group[$i]=$(curl -XGET \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS $api_token" \
-            "$URL" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
-            if [[ -z $new ]]
-            then
-              echo "The group ${list_group[$i]} does not exist"
-            else
-              listid_group[$i]=$new
-            fi
+            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+sw+%22${list_group[$i]}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
           done
 
           echo "Get the user ID"
@@ -191,11 +178,11 @@ stages:
             -H "Authorization: SSWS ${OKTA_TOKEN}" \
             "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
             if [[ $http_code -eq 204 ]]; then
-              echo "User successfully added to ${listid_group[$i]} group"
+              echo "User successfully added to ${list_group[$i]} group"
             elif [[ $http_code -eq 200 ]]; then
-              echo "User was already added to ${listid_group[$i]} group"
+              echo "User was already added to ${list_group[$i]} group"
             else
-              echo "User has not been added to ${listid_group[$i]} group"
+              echo "User has not been added to ${list_group[$i]} group"
               exit -1
             fi
           done

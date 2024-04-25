@@ -73,7 +73,7 @@ stages:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS $api_token" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.[].id' | tr -d '"')
+            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq -r '.[].id')
           done
 
           echo "Creating user and sending activation mail"
@@ -105,7 +105,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq '.[].id' | tr -d '"')
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do
@@ -154,19 +154,20 @@ stages:
              exit -1
           fi
 
+          echo "Show the curl output when searching a group"
           curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS 00qrFeDs8-g_Sql4QBXwWXPo_LivHGS7ezuW3Y1ktA" \
           "https://iam-nm-dev-dpro-admin.okta.com/api/v1/users?search=profile.email+eq+%22naigarcia@eservicios.indra.es%22" | jq 
-
+#
           #echo "Get group ids from all the groups at which the user will be added"
           #for i in ${!list_group[@]}; do
           #  listid_group[$i]=$(curl -XGET \
           #  -H "Accept: application/json" \
           #  -H "Content-Type: application/json" \
           #  -H "Authorization: SSWS $api_token" \
-          #  "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.id' | tr -d '"')
+          #  "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq -r '.id')
           #done
 #
           #echo "Get the user ID"
@@ -174,7 +175,7 @@ stages:
           #-H "Accept: application/json" \
           #-H "Content-Type: application/json" \
           #-H "Authorization: SSWS $api_token" \
-          #"https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq '.[].id' | tr -d '"')    
+          #"https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')    
 #
           #echo "Adding the user to the groups"
           #for i in ${!listid_group[@]}; do
@@ -216,7 +217,7 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | cut -d',' -f1 | cut -d':' -f2 | awk -F'"' '{print $2}')
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | jq -r '.[].id')
           if [[ -z userId ]]; then
             echo "User does not exist"
             exit -1

@@ -113,13 +113,11 @@ stages:
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS ${OKTA_TOKEN}" \
             "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
-            if [[ $http_code -eq 204 ]]; then
-              echo "User successfully added to ${list_group[$i]} group"
-            elif [[ $http_code -eq 200 ]]; then
-              echo "User was already added to ${list_group[$i]} group"
-            else
+            if [[ $http_code -ge 400 ]]; then
               echo "User has not been added to ${list_group[$i]} group"
               exit -1
+            else
+              echo "User successfully added to ${list_group[$i]} group"
             fi
           done
       env:

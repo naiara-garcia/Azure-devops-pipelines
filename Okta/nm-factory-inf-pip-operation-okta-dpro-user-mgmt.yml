@@ -161,12 +161,19 @@ stages:
             "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq -r '.id')
           done
 
+          echo "Showing the group ids:"
+          for str in ${listid_group[@]}; do
+            echo $str
+          done
+
           echo "Get the user ID"
           userId=$(curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.id')    
+
+          echo "User id is $userId"
 
           echo "Adding the user to the groups"
           for i in ${!listid_group[@]}; do

@@ -204,6 +204,8 @@ stages:
             fi
           done
           exit 0
+      env:
+        OKTA_TOKEN: $(okta-token)          
 
   - job: delete_okta_user
     condition: ${{ eq(parameters.option, 'delete_user') }}

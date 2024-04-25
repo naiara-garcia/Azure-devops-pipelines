@@ -160,7 +160,7 @@ stages:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "Authorization: SSWS $api_token" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.[].id' | tr -d '"')
+            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.id' | tr -d '"')
           done
 
           echo "Get the user ID"

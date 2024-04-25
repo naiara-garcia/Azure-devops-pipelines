@@ -156,8 +156,8 @@ stages:
           curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS 00qrFeDs8-g_Sql4QBXwWXPo_LivHGS7ezuW3Y1ktA" \
-          "https://iam-nm-dev-dpro-admin.okta.com/api/v1/users?search=profile.email+eq+%22naigarcia@eservicios.indra.es%22" | jq -r '.[].id'
+          -H "Authorization: SSWS $api_token" \
+          "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.email+eq+%22dprodev1c_dplt_administrator%22" | jq -r '.[].id'
 #
           #echo "Get group ids from all the groups at which the user will be added"
           #for i in ${!list_group[@]}; do

@@ -154,39 +154,45 @@ stages:
              exit -1
           fi
 
-          echo "Get group ids from all the groups at which the user will be added"
-          for i in ${!list_group[@]}; do
-            listid_group[$i]=$(curl -XGET \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: SSWS $api_token" \
-            "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.id' | tr -d '"')
-          done
-
-          echo "Get the user ID"
-          userId=$(curl -X GET \
+          curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $api_token" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq '.[].id' | tr -d '"')    
+          -H "Authorization: SSWS 00qrFeDs8-g_Sql4QBXwWXPo_LivHGS7ezuW3Y1ktA" \
+          "https://iam-nm-dev-dpro-admin.okta.com/api/v1/users?search=profile.email+eq+%22naigarcia@eservicios.indra.es%22" | jq 
 
-          echo "Adding the user to the groups"
-          for i in ${!listid_group[@]}; do
-            curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
-            "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
-            if [[ $http_code -eq 204 ]]; then
-              echo "User successfully added to ${list_group[$i]} group"
-            elif [[ $http_code -eq 200 ]]; then
-              echo "User was already added to ${list_group[$i]} group"
-            else
-              echo "User has not been added to ${list_group[$i]} group"
-              exit -1
-            fi
-          done
-          exit 0
+          #echo "Get group ids from all the groups at which the user will be added"
+          #for i in ${!list_group[@]}; do
+          #  listid_group[$i]=$(curl -XGET \
+          #  -H "Accept: application/json" \
+          #  -H "Content-Type: application/json" \
+          #  -H "Authorization: SSWS $api_token" \
+          #  "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq '.id' | tr -d '"')
+          #done
+#
+          #echo "Get the user ID"
+          #userId=$(curl -X GET \
+          #-H "Accept: application/json" \
+          #-H "Content-Type: application/json" \
+          #-H "Authorization: SSWS $api_token" \
+          #"https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq '.[].id' | tr -d '"')    
+#
+          #echo "Adding the user to the groups"
+          #for i in ${!listid_group[@]}; do
+          #  curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
+          #  -H "Accept: application/json" \
+          #  -H "Content-Type: application/json" \
+          #  -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          #  "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
+          #  if [[ $http_code -eq 204 ]]; then
+          #    echo "User successfully added to ${list_group[$i]} group"
+          #  elif [[ $http_code -eq 200 ]]; then
+          #    echo "User was already added to ${list_group[$i]} group"
+          #  else
+          #    echo "User has not been added to ${list_group[$i]} group"
+          #    exit -1
+          #  fi
+          #done
+          #exit 0
 
   - job: delete_okta_user
     condition: ${{ eq(parameters.option, 'delete_user') }}

@@ -32,7 +32,8 @@ case $OPTION in
 
         #Keycloak group ID -> Keycloak group name
         #d3e9bc67-b197-4f54-874c-32667d63eff3 -> dpro_jenkins_developers
-        groups_id='d3e9bc67-b197-4f54-874c-32667d63eff3'
+        #f8612ce9-af5e-4ee5-a509-4f7b3573d8f2 -> nx-readonly
+        groups_id='d3e9bc67-b197-4f54-874c-32667d63eff3 f8612ce9-af5e-4ee5-a509-4f7b3573d8f2'
 
         echo $groups_id
 
@@ -101,13 +102,14 @@ case $OPTION in
         done
         echo "User successfully added to infra_admin groups"
     ;;
-    avitech_slovakia)
+    dpro_dplt_developer)
         #Adding user to avitech_slovakia groups
 
         #Keycloak group ID -> Keycloak group name
         #d3e9bc67-b197-4f54-874c-32667d63eff3 -> dpro_jenkins_developers
+        #cb0359b0-5b79-4614-8e3d-bed79fea224d -> dplt_jenkins_developers
         #f8612ce9-af5e-4ee5-a509-4f7b3573d8f2 -> nx-readonly
-        groups_id='d3e9bc67-b197-4f54-874c-32667d63eff3 f8612ce9-af5e-4ee5-a509-4f7b3573d8f2'
+        groups_id='d3e9bc67-b197-4f54-874c-32667d63eff3 cb0359b0-5b79-4614-8e3d-bed79fea224d f8612ce9-af5e-4ee5-a509-4f7b3573d8f2'
 
         echo $groups_id
 

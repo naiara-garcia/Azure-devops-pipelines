@@ -27,7 +27,7 @@ parameters:
       - dplt_pipeline
       - dplt_developer
       - infra_admin
-      - avitech_slovakia
+      - dpro_dplt_developer
       - remove_user
 
 stages:

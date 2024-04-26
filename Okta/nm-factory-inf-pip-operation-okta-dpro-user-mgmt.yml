@@ -68,7 +68,7 @@ stages:
               "email": "'"${{parameters.email}}"'",
               "login": "'"${{parameters.email}}"'"
             }
-          }' "https://${{variables.oktaDomain}}/api/v1/users?activate=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+          }' "https://${{variables.oktaDomain}}/api/v1/users?activate=true" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
 
           cat resp.json
           http_code=$(jq .http_code resp.json | tr -d '"') 

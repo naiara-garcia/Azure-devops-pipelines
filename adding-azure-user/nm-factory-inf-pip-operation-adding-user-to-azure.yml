@@ -460,6 +460,14 @@ stages:
                 sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
                 echo "User added to all_users group"
               fi
+              echo "Check that user is not currently at the group infra_team_members"
+              mail=`sed -n '/^infra_team_members/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to infra_team_members group"
+                sed -i "/infra_team_members/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to infra_team_members group"
+              fi
             ;;              
             dplt_pipeline)
               echo "Check that user is not currently at the group all_users"
@@ -489,6 +497,14 @@ stages:
                 echo "Adding new user to all_users group"
                 sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
                 echo "User added to all_users group"
+              fi
+              echo "Check that user is not currently at the group support_contrib_team_members"
+              mail=`sed -n '/^support_contrib_team_members/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to support_contrib_team_members group"
+                sed -i "/support_contrib_team_members/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to support_contrib_team_members group"
               fi
             ;;
             remove_user)

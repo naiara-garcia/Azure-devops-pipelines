@@ -20,6 +20,13 @@ parameters:
     displayName: User Email
     type: string
   - name: option
+    displayName: User option
+    type: string
+    values:
+      - create_user
+      - update_user
+      - remove_user    
+  - name: option
     displayName: Group Option
     type: string
     values:
@@ -27,8 +34,7 @@ parameters:
       - dplt_pipeline
       - dplt_developer
       - infra_admin
-      - avitech_slovakia
-      - remove_user
+      - dpro_dplt_developer
 
 stages:
   - stage: Manage_Keycloak_Users
@@ -70,7 +76,7 @@ stages:
 
           - task: Bash@3
             displayName: "Creating user at Keycloak"
-            condition: notIn( '${{parameters.option}}', 'remove_user')
+            condition: in( '${{parameters.option}}', 'create_user')
             inputs:
               targetType: inline
               script: |
@@ -90,7 +96,7 @@ stages:
 
                 chmod +x ./Keycloak/keycloak-user-mgmt-dev.sh
 
-                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt-dev.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.option }}
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt-dev.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.group }}
 
           - task: Bash@3
             displayName: "Removing user at Keycloak"

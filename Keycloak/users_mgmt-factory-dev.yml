@@ -26,7 +26,7 @@ parameters:
       - create_user
       - update_user
       - remove_user    
-  - name: option
+  - name: group
     displayName: Group Option
     type: string
     values:

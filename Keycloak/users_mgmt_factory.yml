@@ -20,6 +20,13 @@ parameters:
     displayName: User Email
     type: string
   - name: option
+    displayName: User option
+    type: string
+    values:
+      - create_user
+      - update_user
+      - remove_user
+  - name: group
     displayName: Group Option
     type: string
     values:
@@ -28,7 +35,6 @@ parameters:
       - dplt_developer
       - infra_admin
       - dpro_dplt_developer
-      - remove_user
 
 stages:
   - stage: Manage_Keycloak_Users
@@ -46,7 +52,7 @@ stages:
 
           - task: AzureCLI@2
             displayName: "Getting the username of the Azure Active Directory user"
-            condition: notIn( '${{parameters.option}}', 'remove_user')
+            condition: in( '${{parameters.option}}', 'create_user')
             env:
               ARM_CLIENT_ID: $(terraform-app-client-id)
               ARM_CLIENT_SECRET: $(terraform-app-secret)
@@ -70,7 +76,7 @@ stages:
 
           - task: Bash@3
             displayName: "Creating user at Keycloak"
-            condition: notIn( '${{parameters.option}}', 'remove_user')
+            condition: in( '${{parameters.option}}', 'create_user')
             inputs:
               targetType: inline
               script: |
@@ -90,7 +96,7 @@ stages:
 
                 chmod +x ./Keycloak/keycloak-user-mgmt.sh
 
-                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.option }}
+                docker run --entrypoint `pwd`/Keycloak/keycloak-user-mgmt.sh -v `pwd`:`pwd` -w `pwd` -i --rm quay.io/keycloak/keycloak:19.0.3 ${{ variables.keycloak_hostname }} ${{ variables.user_realm }} $(password) ${{ parameters.mail }} ${{ parameters.group }}
 
           - task: Bash@3
             displayName: "Removing user at Keycloak"

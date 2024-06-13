@@ -5,13 +5,13 @@ trigger: none # will disable CI builds entirely
 pool:
   name: Factory-VSS-Agents
 
-schedules:
-- cron: "0 1 * * *"
-  displayName: Nightly recreate DPLT Jenkins Agent
-  branches:
-    include:
-    - main
-  always: true
+# schedules:
+# - cron: "0 1 * * *"
+#   displayName: Nightly recreate DPLT Jenkins Agent
+#   branches:
+#     include:
+#     - main
+#   always: true
 
 resources:
   repositories:

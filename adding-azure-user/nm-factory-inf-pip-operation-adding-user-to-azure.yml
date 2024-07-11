@@ -181,7 +181,7 @@ stages:
               mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
               if [[ -z "$mail" ]] 
               then 
-                echo "Adding new user to dplt_developer Azure Devops Group"
+                echo "Adding new user to dplt_developer Azure AD Group"
                 sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
                 echo "User added to dplt_developer group"
               fi     
@@ -359,7 +359,7 @@ stages:
           bash nm-factory-inf-pip-operations/adding-azure-user/scripts/approve-pr.sh $(mypat) ${{ variables.AZUREREPO }} ${{ parameters.branch }}
 
   - job: add_user_to_azure_devops
-    condition: notIn( '${{parameters.option}}', 'dpro_developer', 'dplt_developer')
+    condition: notIn( '${{parameters.option}}', 'dpro_developer')
     variables:
     - name: BRANCHTARGET
       value: "feature/${{ parameters.branch }}"
@@ -470,6 +470,16 @@ stages:
               fi
             ;;              
             dplt_pipeline)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
+              fi
+            ;;
+            dplt_developer)
               echo "Check that user is not currently at the group all_users"
               mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
               if [[ -z "$mail" ]] 

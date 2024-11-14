@@ -22,8 +22,8 @@ parameters:
   displayName: Okta DPRO Group
   type: string
   values:
-    - developer(dprodev1c,dprodev3c,dprodev4c,nmdevtst4c,nmdevtst8c,nmdevtst10c)
-    - administrator(dprodev1c)
+    - developer
+    - administrator
 
 - name: option
   displayName: Option
@@ -100,9 +100,9 @@ stages:
         targetType: 'inline'
         script: |   
           echo "Create variable with all groups needed"
-          if [[ ${{parameters.dproGroup}} == "developer(dprodev1c,dprodev3c,dprodev4c,nmdevtst4c,nmdevtst8c,nmdevtst10c)" ]]; then
+          if [[ ${{parameters.dproGroup}} == "developer" ]]; then
              list_group=("dprodev1c_dplt_developer"               "dprodev3c_dplt_developer"                 "dprodev4c_dplt_developer" "nmdevtst4c_dplt_developer" "nmdevtst8c_dplt_developer" "nmdevtst10c_dplt_developer")
-          elif [[ ${{parameters.dproGroup}} == "administrator(dprodev1c)" ]]; then
+          elif [[ ${{parameters.dproGroup}} == "administrator" ]]; then
              list_group=("dprodev1c_dplt_administrator")
           else
              echo "Bad dpro group option"

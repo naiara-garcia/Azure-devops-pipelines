@@ -41,12 +41,14 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          echo "Verifying if user was created previously before creating it"
+          echo "Verifying that the user was not created previously"
+
           userId=$(curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS $(okta-token)" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | jq -r '.[].id')        
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')  
+
           if [[ -z userId ]]; then
             echo "Creating user and sending activation mail"
             curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
@@ -72,7 +74,7 @@ stages:
               echo "User created successfully"
             fi
           else
-            echo "User was created previously"
+              echo "User was created previously"
           fi
 
   - job: adding_user_to_groups

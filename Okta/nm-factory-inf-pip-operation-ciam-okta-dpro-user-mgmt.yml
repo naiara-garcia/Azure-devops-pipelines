@@ -54,7 +54,7 @@ stages:
           curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $(okta_token)" \
+          -H "Authorization: SSWS $(okta-token)" \
           -d '{
             "profile": {
               "firstName": "'"${{parameters.firstName}}"'",
@@ -74,7 +74,7 @@ stages:
             echo "User created successfully"
           fi
 #      env:
-#        okta_token: $(okta-ciam-token)
+#        okta-token: $(okta-ciam-token)
 
   - job: adding_user_to_groups
     condition: not( ${{ eq(parameters.option, 'delete_user') }} )
@@ -101,7 +101,7 @@ stages:
             listid_group[$i]=$(curl -XGET \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
-            -H "Authorization: SSWS $(okta_token)" \
+            -H "Authorization: SSWS $(okta-token)" \
             "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq -r '.[].id')
           done
 
@@ -109,7 +109,7 @@ stages:
           userId=$(curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $(okta_token)" \
+          -H "Authorization: SSWS $(okta-token)" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')    
 
           echo "Adding the user to the group(s)"
@@ -117,7 +117,7 @@ stages:
             curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
-            -H "Authorization: SSWS $(okta_token)" \
+            -H "Authorization: SSWS $(okta-token)" \
             "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
             if [[ $http_code -ge 400 ]]; then
               echo "User has not been added to ${list_group[$i]} group"
@@ -127,7 +127,7 @@ stages:
             fi
           done
 #      env:
-#        okta_token: $(okta-ciam-token)          
+#        okta-token: $(okta-ciam-token)          
 
   - job: delete_okta_user
     condition: ${{ eq(parameters.option, 'delete_user') }}
@@ -149,7 +149,7 @@ stages:
           userId=$(curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $(okta_token)" \
+          -H "Authorization: SSWS $(okta-token)" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | jq -r '.[].id')
           if [[ -z userId ]]; then
             echo "User does not exist"
@@ -162,7 +162,7 @@ stages:
           curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $(okta_token)" \
+          -H "Authorization: SSWS $(okta-token)" \
           "https://${{variables.oktaDomain}}/api/v1/users/$userId/lifecycle/deactivate?sendEmail=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
 
           http_code=$(jq .http_code resp.json | tr -d '"') 
@@ -177,7 +177,7 @@ stages:
           curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $(okta_token)" \
+          -H "Authorization: SSWS $(okta-token)" \
           "https://${{variables.oktaDomain}}/api/v1/users/$userId?sendEmail=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
           http_code=$(jq .http_code resp.json | tr -d '"') 
           if [[ $http_code -ge 400 ]]; then
@@ -187,4 +187,4 @@ stages:
             echo "User deleted successfully"
           fi
 #      env:
-#        okta_token: $(okta-ciam-token)
+#        okta-token: $(okta-ciam-token)

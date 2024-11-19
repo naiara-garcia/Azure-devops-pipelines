@@ -47,7 +47,9 @@ stages:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS $(okta-token)" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')  
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id') 
+
+          echo "userId = $userId" 
 
           if [[ -z userId ]]; then
             echo "Creating user and sending activation mail"

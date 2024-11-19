@@ -23,7 +23,6 @@ parameters:
   type: string
   values:
     - create_user
-    - update_user
     - delete_user
 
 variables:
@@ -37,59 +36,45 @@ stages:
   - job: create_okta_user
     condition: ${{ eq(parameters.option, 'create_user') }}
     steps:
-#    - task: AzureKeyVault@2
-#      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
-#      inputs:
-#        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-#        KeyVaultName: 'ecl-az-fact-kvt-01-main'
-#        SecretsFilter: 'okta-ciam-token'
-#        RunAsPreJob: true                
-
     - task: Bash@3
       displayName: 'Creation of the user'
       inputs:
         targetType: 'inline'
         script: |
-          echo "Creating user and sending activation mail"
-          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -H "Authorization: SSWS $(okta-token)" \
-          -d '{
-            "profile": {
-              "firstName": "'"${{parameters.firstName}}"'",
-              "lastName": "'"${{parameters.lastName}}"'",
-              "email": "'"${{parameters.email}}"'",
-              "login": "'"${{parameters.email}}"'"
-            }
-          }' "https://${{variables.oktaDomain}}/api/v1/users?activate=true" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+          if [[ -z userId ]]; then
+            echo "Creating user and sending activation mail"
+            curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: SSWS $(okta-token)" \
+            -d '{
+              "profile": {
+                "firstName": "'"${{parameters.firstName}}"'",
+                "lastName": "'"${{parameters.lastName}}"'",
+                "email": "'"${{parameters.email}}"'",
+                "login": "'"${{parameters.email}}"'"
+              }
+            }' "https://${{variables.oktaDomain}}/api/v1/users?activate=true" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
 
-          cat resp.json
-          http_code=$(jq .http_code resp.json | tr -d '"') 
+            cat resp.json
+            http_code=$(jq .http_code resp.json | tr -d '"') 
 
-          if [[ $http_code -ge 400 ]]; then
-            echo "Operation Failed, the user has not been created"
-            exit -1
+            if [[ $http_code -ge 400 ]]; then
+              echo "Operation Failed, the user has not been created"
+              exit -1
+            else
+              echo "User created successfully"
+            fi
           else
-            echo "User created successfully"
+            echo "User was created previously"
           fi
-#      env:
-#        okta-token: $(okta-ciam-token)
 
   - job: adding_user_to_groups
-    condition: not( ${{ eq(parameters.option, 'delete_user') }} )
+    condition: ${{ eq(parameters.option, 'create_user') }}
     dependsOn: create_okta_user
-    steps:
-#    - task: AzureKeyVault@2
-#      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
-#      inputs:
-#        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-#        KeyVaultName: 'ecl-az-fact-kvt-01-main'
-#        SecretsFilter: 'okta-ciam-token'
-#        RunAsPreJob: true     
-
+    steps:  
     - task: Bash@3
-      displayName: 'Adding user to group'
+      displayName: 'Adding user to group(s)'
       inputs:
         targetType: 'inline'
         script: |   
@@ -125,21 +110,11 @@ stages:
             else
               echo "User successfully added to ${list_group[$i]} group"
             fi
-          done
-#      env:
-#        okta-token: $(okta-ciam-token)          
+          done       
 
   - job: delete_okta_user
     condition: ${{ eq(parameters.option, 'delete_user') }}
     steps:
-#    - task: AzureKeyVault@2
-#      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
-#      inputs:
-#        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-#        KeyVaultName: 'ecl-az-fact-kvt-01-main'
-#        SecretsFilter: 'okta-ciam-token'
-#        RunAsPreJob: true     
-
     - task: Bash@3
       displayName: 'Deleting user'
       inputs:
@@ -186,5 +161,3 @@ stages:
           else
             echo "User deleted successfully"
           fi
-#      env:
-#        okta-token: $(okta-ciam-token)

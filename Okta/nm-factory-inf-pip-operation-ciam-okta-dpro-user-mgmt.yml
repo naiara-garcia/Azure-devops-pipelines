@@ -41,6 +41,12 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          echo "Verifying if user was created previously before creating it"
+          userId=$(curl -X GET \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: SSWS $(okta-token)" \
+          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | jq -r '.[].id')        
           if [[ -z userId ]]; then
             echo "Creating user and sending activation mail"
             curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \

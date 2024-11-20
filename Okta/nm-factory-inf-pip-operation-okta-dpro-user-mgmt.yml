@@ -58,40 +58,26 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          echo "Verifying that the user was not created previously"
-
-          userId=$(curl -X GET \
+          echo "Creating user and sending activation mail"
+          curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -H "Authorization: SSWS ${OKTA_TOKEN}" \
-          "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')  
-
-          if [[ -z userId ]]; then
-            echo "Creating user and sending activation mail"
-            curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
-            -d '{
-              "profile": {
-                "firstName": "'"${{parameters.firstName}}"'",
-                "lastName": "'"${{parameters.lastName}}"'",
-                "email": "'"${{parameters.email}}"'",
-                "login": "'"${{parameters.email}}"'"
-              }
-            }' "https://${{variables.oktaDomain}}/api/v1/users?activate=true" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
-
-            cat resp.json
-            http_code=$(jq .http_code resp.json | tr -d '"') 
-
-            if [[ $http_code -ge 400 ]]; then
-              echo "Operation Failed, the user has not been created"
-              exit -1
-            else
-              echo "User created successfully"
-            fi
+          -d '{
+            "profile": {
+              "firstName": "'"${{parameters.firstName}}"'",
+              "lastName": "'"${{parameters.lastName}}"'",
+              "email": "'"${{parameters.email}}"'",
+              "login": "'"${{parameters.email}}"'"
+            }
+          }' "https://${{variables.oktaDomain}}/api/v1/users?activate=true" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
+          cat resp.json
+          http_code=$(jq .http_code resp.json | tr -d '"') 
+          if [[ $http_code -ge 400 ]]; then
+            echo "Operation Failed, the user has not been created"
+            exit -1
           else
-              echo "User was created previously"
+            echo "User created successfully"
           fi
 
       env:

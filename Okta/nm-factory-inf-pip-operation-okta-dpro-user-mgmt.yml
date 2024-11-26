@@ -22,8 +22,10 @@ parameters:
   displayName: Okta DPRO Group
   type: string
   values:
-    - 1c,2c
-    - 1c,2c,3c
+    - dprodev_admin
+    - dprodev_developer
+    - nmdevtst_admin
+    - nmdevtst_developer
 
 - name: option
   displayName: Option
@@ -69,16 +71,15 @@ stages:
               "login": "'"${{parameters.email}}"'"
             }
           }' "https://${{variables.oktaDomain}}/api/v1/users?activate=true" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
-
           cat resp.json
           http_code=$(jq .http_code resp.json | tr -d '"') 
-
           if [[ $http_code -ge 400 ]]; then
             echo "Operation Failed, the user has not been created"
             exit -1
           else
             echo "User created successfully"
           fi
+
       env:
         OKTA_TOKEN: $(okta-token)
 
@@ -100,10 +101,14 @@ stages:
         targetType: 'inline'
         script: |   
           echo "Create variable with all groups needed"
-          if [[ ${{parameters.dproGroup}} == "1c,2c" ]]; then
-             list_group=("dprodev1c_dplt_administrator"               "dprodev1c_plop_full_write"                 "dprodev1c_plop_full_read" "dprodev1c_po_full_write" "dprodev1c_po_full_read" "dprodev1c_po_product_read" "dprodev1c_po_product_write" "dprodev2c_dplt_administrator"               "dprodev2c_plop_full_write"                 "dprodev2c_plop_full_read" "dprodev2c_po_full_write" "dprodev2c_po_full_read" "dprodev2c_po_product_read" "dprodev2c_po_product_write")
-          elif [[ ${{parameters.dproGroup}} == "1c,2c,3c" ]]; then
-             list_group=("dprodev1c_dplt_administrator"               "dprodev1c_plop_full_write"                 "dprodev1c_plop_full_read" "dprodev1c_po_full_write" "dprodev1c_po_full_read" "dprodev1c_po_product_read" "dprodev1c_po_product_write" "dprodev2c_dplt_administrator"               "dprodev2c_plop_full_write"                 "dprodev2c_plop_full_read" "dprodev2c_po_full_write" "dprodev2c_po_full_read" "dprodev2c_po_product_read" "dprodev2c_po_product_write" "dprodev3c_dplt_administrator"               "dprodev3c_plop_full_write"                 "dprodev3c_plop_full_read" "dprodev3c_po_full_write" "dprodev3c_po_full_read" "dprodev3c_po_product_read" "dprodev3c_po_product_write")
+          if [[ ${{parameters.dproGroup}} == "dprodev_admin" ]]; then
+             list_group=("dprodev1c_dplt_administrator"               "dprodev2c_dplt_administrator"               "dprodev3c_dplt_administrator"                 "dprodev4c_dplt_administrator")
+          elif [[ ${{parameters.dproGroup}} == "dprodev_developer" ]]; then
+             list_group=("dprodev1c_dplt_developer"               "dprodev2c_dplt_developer"               "dprodev3c_dplt_developer"                 "dprodev4c_dplt_developer")     
+          elif [[ ${{parameters.dproGroup}} == "nmdevtst_admin" ]]; then
+             list_group=("nmdevtst2c_dplt_administrator"               "nmdevtst4c_dplt_administrator" "nmdevtst8c_dplt_administrator" "nmdevtst10c_dplt_administrator")                     
+          elif [[ ${{parameters.dproGroup}} == "nmdevtst_developer" ]]; then
+             list_group=("nmdevtst2c_dplt_developer"               "nmdevtst4c_dplt_developer" "nmdevtst8c_dplt_developer" "nmdevtst10c_dplt_developer")              
           else
              echo "Bad dpro group option"
              exit -1

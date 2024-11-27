@@ -26,7 +26,6 @@ parameters:
     - delete_user
 
 variables:
-- group: factory-okta-ciam-dpro-token
 - name: oktaDomain
   value: "ciam-nm-dev-dpro-admin.okta.com"
 

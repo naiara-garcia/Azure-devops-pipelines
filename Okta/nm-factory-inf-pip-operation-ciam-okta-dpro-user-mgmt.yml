@@ -23,6 +23,7 @@ parameters:
   type: string
   values:
     - create_user
+    - update_user
     - delete_user
 
 variables:
@@ -74,7 +75,7 @@ stages:
         OKTA_CIAM_TOKEN: $(okta-ciam-token)
 
   - job: adding_user_to_groups
-    condition: ${{ eq(parameters.option, 'create_user') }}
+    condition: not( ${{ eq(parameters.option, 'delete_user') }} )
     dependsOn: create_okta_user
     steps:  
     - task: AzureKeyVault@2

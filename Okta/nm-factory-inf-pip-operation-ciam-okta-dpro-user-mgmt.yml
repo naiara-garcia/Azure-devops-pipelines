@@ -18,6 +18,13 @@ parameters:
   displayName: Email
   type: string
 
+- name: dproGroup
+  displayName: Okta DPRO Group
+  type: string
+  values:
+    - ectl
+    - indra
+
 - name: option
   displayName: Option
   type: string
@@ -91,8 +98,15 @@ stages:
       inputs:
         targetType: 'inline'
         script: |   
-          echo "Create variable with group(s) needed"
-          list_group=("ECTL-Users")
+          echo "Create variable with all groups needed"
+          if [[ ${{parameters.dproGroup}} == "ectl" ]]; then
+             list_group=("ECTL-Users")
+          elif [[ ${{parameters.dproGroup}} == "indra" ]]; then
+             list_group=("Indra-users")                               
+          else
+             echo "Bad dpro group option"
+             exit -1
+          fi
 
           echo "Get group ids from the group(s) at which the user will be added"
           for i in ${!list_group[@]}; do

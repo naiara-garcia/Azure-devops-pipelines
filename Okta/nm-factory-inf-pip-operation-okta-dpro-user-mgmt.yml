@@ -28,6 +28,7 @@ parameters:
     - Openshift_Factory_2C
     - ECTL_Openshift_2C,4C,8C,9C,10C,11C,14C_developer
     - ECTL_Openshift_2C,4C,8C,9C,10C,11C,14C_PGadmin    
+    - ECTL_Openshift_14C_operator
 
 - name: option
   displayName: Option
@@ -115,6 +116,8 @@ stages:
              list_group=("nmdevtst2c_dplt_developer"               "nmdevtst4c_dplt_developer"                 "nmdevtst8c_dplt_developer"                 "nmdevtst10c_dplt_developer"                 "nmdevtst11c_dplt_developer"                 "nmdevtst14c_dplt_developer")                               
           elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,14C_PGadmin" ]]; then
              list_group=("nmdevtst2c_dplt_administrator"               "nmdevtst4c_dplt_administrator"                 "nmdevtst8c_dplt_administrator"                 "nmdevtst10c_dplt_administrator"               "nmdevtst11c_dplt_administrator"               "nmdevtst14c_dplt_administrator")                               
+          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_14C_operator" ]]; then
+             list_group=("nmdevtst14c_dplt_operator")                               
           else
              echo "Bad dpro group option"
              exit -1

@@ -22,8 +22,13 @@ parameters:
   displayName: Okta DPRO Group
   type: string
   values:
-    - dprodev
-    - nmdevtst
+    - Openshift_Factory_1C,3C,4C_developer
+    - Openshift_Factory_1C,3C,4C_PGadmin
+    - Openshift_Factory_1C,3C,4C_operator
+    - Openshift_Factory_2C
+    - ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_developer
+    - ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_PGadmin    
+    - ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_operator
 
 - name: option
   displayName: Option
@@ -99,10 +104,20 @@ stages:
         targetType: 'inline'
         script: |   
           echo "Create variable with all groups needed"
-          if [[ ${{parameters.dproGroup}} == "dprodev" ]]; then
-             list_group=("dprodev1c_dplt_administrator"               "dprodev3c_dplt_administrator"                 "dprodev4c_dplt_administrator"                 "dprodev1c_dplt_developer"               "dprodev3c_dplt_developer"                 "dprodev4c_dplt_developer")
-          elif [[ ${{parameters.dproGroup}} == "nmdevtst" ]]; then
-             list_group=("nmdevtst2c_dplt_administrator"               "nmdevtst4c_dplt_administrator"                 "nmdevtst8c_dplt_administrator"                 "nmdevtst10c_dplt_administrator"               "nmdevtst2c_dplt_developer"               "nmdevtst4c_dplt_developer"                 "nmdevtst8c_dplt_developer"                 "nmdevtst10c_dplt_developer")                               
+          if [[ ${{parameters.dproGroup}} == "Openshift_Factory_1C,3C,4C_developer" ]]; then
+             list_group=("dprodev1c_dplt_developer"               "dprodev3c_dplt_developer"                 "dprodev4c_dplt_developer")
+          elif [[ ${{parameters.dproGroup}} == "Openshift_Factory_1C,3C,4C_PGadmin" ]]; then
+             list_group=("dprodev1c_dplt_administrator"               "dprodev3c_dplt_administrator"                 "dprodev4c_dplt_administrator")
+          elif [[ ${{parameters.dproGroup}} == "Openshift_Factory_1C,3C,4C_operator" ]]; then
+             list_group=("dprodev1c_dplt_operator"               "dprodev3c_dplt_operator"                 "dprodev4c_dplt_operator")
+          elif [[ ${{parameters.dproGroup}} == "Openshift_Factory_2C" ]]; then
+             list_group=("dprodev2c_dplt_administrator"               "dprodev2c_dplt_developer")
+          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_developer" ]]; then
+             list_group=("nmdevtst2c_dplt_developer"               "nmdevtst4c_dplt_developer"                 "nmdevtst8c_dplt_developer"                 "nmdevtst9c_dplt_developer"                 "nmdevtst10c_dplt_developer"                 "nmdevtst11c_dplt_developer"                 "nmdevtst13c_dplt_developer"                 "nmdevtst14c_dplt_developer")                               
+          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_PGadmin" ]]; then
+             list_group=("nmdevtst2c_dplt_administrator"               "nmdevtst4c_dplt_administrator"                 "nmdevtst8c_dplt_administrator"                 "nmdevtst9c_dplt_administrator"                 "nmdevtst10c_dplt_administrator"               "nmdevtst11c_dplt_administrator"               "nmdevtst13c_dplt_administrator"               "nmdevtst14c_dplt_administrator")                               
+          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_operator" ]]; then
+             list_group=("nmdevtst2c_dplt_operator"               "nmdevtst4c_dplt_operator"                 "nmdevtst8c_dplt_operator"                 "nmdevtst9c_dplt_operator"                 "nmdevtst10c_dplt_operator"               "nmdevtst11c_dplt_operator"               "nmdevtst13c_dplt_operator"               "nmdevtst14c_dplt_operator")                               
           else
              echo "Bad dpro group option"
              exit -1

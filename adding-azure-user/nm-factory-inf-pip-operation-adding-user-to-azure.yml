@@ -34,6 +34,7 @@ parameters:
   - dplt_developer
   - infra_admin
   - support_contrib
+  - dplt_security
   - remove_user
 - name: branch
   displayName: Ticket Number
@@ -289,6 +290,24 @@ stages:
                 sed -i "/group_azdevops_support_contrib_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
               fi          
             ;;
+            dplt_security)
+              echo "Check that user is not currently at the group nmcommonsec_storage_reader"
+              mail=`sed -n '/^group_nmcommonsec_storage_reader_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to nmcommonsec_storage_reader Azure AD Group"
+                sed -i "/group_nmcommonsec_storage_reader_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                echo "User added to nmcommonsec_storage_reader group"
+              fi 
+              echo "Check that user is not currently at the group dplt_developer"
+              mail=`sed -n '/^group_dplt_dev_members/,/^]/p' terraform.tfvars | grep ${{ parameters.mail }}`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to dplt_developer Azure AD Group"
+                sed -i "/group_dplt_dev_members/a \ \ \"${{ parameters.mail }}\"," terraform.tfvars
+                echo "User added to dplt_developer group"
+              fi     
+            ;;
             remove_user)
               echo "Remove user from all groups"
               sed -i "/${{ parameters.mail }}/d" terraform.tfvars
@@ -515,6 +534,16 @@ stages:
                 echo "Adding new user to support_contrib_team_members group"
                 sed -i "/support_contrib_team_members/a \ \ \"$user_mail\"," terraform.tfvars
                 echo "User added to support_contrib_team_members group"
+              fi
+            ;;
+            dplt_security)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
               fi
             ;;
             remove_user)

@@ -527,6 +527,16 @@ stages:
                 echo "User added to all_users group"
               fi
             ;;
+            dplt_security)
+              echo "Check that user is not currently at the group all_users"
+              mail=`sed -n '/^all_users/,/^]/p' terraform.tfvars | grep $user_mail`
+              if [[ -z "$mail" ]] 
+              then 
+                echo "Adding new user to all_users group"
+                sed -i "/all_users/a \ \ \"$user_mail\"," terraform.tfvars
+                echo "User added to all_users group"
+              fi
+            ;;
             remove_user)
               echo "Remove user from all groups"
               sed -i "/$user_mail/d" terraform.tfvars

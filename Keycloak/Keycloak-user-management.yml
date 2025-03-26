@@ -39,21 +39,9 @@ stages:
       - job: managing_keycloak_users
 
         steps:
-          - task: AzureKeyVault@2
-            displayName: "Azure Key Vault secrets"
-            inputs:
-              azureSubscription: "<subscription>"
-              KeyVaultName: "<keyvault_name>"
-              SecretsFilter: "<secrets>"
-              RunAsPreJob: true
-
           - task: AzureCLI@2
             displayName: "Getting the username of the Azure Active Directory user"
             condition: in( '${{parameters.option}}', 'create_user')
-            env:
-              ARM_CLIENT_ID: $(terraform-app-client-id)
-              ARM_CLIENT_SECRET: $(terraform-app-secret)
-              ARM_TENANT_ID: $(tenant)
             inputs:
               azureSubscription: "<subscription>"
               scriptType: "bash"

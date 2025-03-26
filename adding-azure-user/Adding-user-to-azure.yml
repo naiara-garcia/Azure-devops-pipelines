@@ -50,14 +50,6 @@ stages:
       value: <reviewers_team>
 
     steps:
-    - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault secrets'
-      inputs:
-        azureSubscription: '<subscription>'
-        KeyVaultName: '<keyvault_name>'
-        SecretsFilter: '<secrets>'
-        RunAsPreJob: true
-
     - task: AzureCLI@2
       displayName: "Install TFenv"
       inputs:
@@ -104,10 +96,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Adding user to Azure AD groups" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "$(tenant)"
       inputs:
         azureSubscription: '<subscription>'
         scriptType: 'bash'
@@ -116,7 +104,6 @@ stages:
           #!/bin/bash
 
           echo "Create a new branch locally for $AZUREREPO repository"
-          cd $AZUREREPO/004-aad
           git checkout -b $BRANCHTARGET
           echo "Added a new line to terraform.tfvars file at $AZUREREPO repository"
           case ${{ parameters.option }} in
@@ -185,12 +172,8 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREREPO }} repository" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: $(tenant)
       inputs:
-        azureSubscription: '<subxcription>'
+        azureSubscription: '<subscription>'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
@@ -222,14 +205,6 @@ stages:
       value: <reviewers_team>
 
     steps:
-    - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault secrets'
-      inputs:
-        azureSubscription: '<subscription>'
-        KeyVaultName: '<keyvault_name>'
-        SecretsFilter: '<secrets>'
-        RunAsPreJob: true
-
     - task: AzureCLI@2
       displayName: "Install TFenv"
       inputs:
@@ -276,10 +251,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Added user license for Azure Devops" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: $(tenant)
       inputs:
         azureSubscription: '<subscription>'
         scriptType: 'bash'
@@ -357,10 +328,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Pull Request creation for ${{ variables.AZUREDEVOPSREPO }} repository" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: $(tenant)
       inputs:
         azureSubscription: '<subscription>'
         scriptType: 'bash'
@@ -370,10 +337,6 @@ stages:
 
     - task: AzureCLI@2
       displayName: "Merging with main branch at repository ${{ variables.AZUREDEVOPSREPO }}" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: $(tenant)
       inputs:
         azureSubscription: '<subscription>'
         scriptType: 'bash'

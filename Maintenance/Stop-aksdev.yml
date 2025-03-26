@@ -21,10 +21,6 @@ stages:
     steps:
     - task: AzureCLI@2
       displayName: "Stop AKSdev cluster" 
-      env:
-        ARM_CLIENT_ID: $(terraform-app-client-id)
-        ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: $(tenant)
       inputs:
         azureSubscription: '<subscription>'
         scriptType: 'bash'

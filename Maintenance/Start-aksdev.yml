@@ -1,4 +1,4 @@
-name: nm-factory-inf-pip-operation-start-aksdev
+name: Start-aksdev
 
 pool:
   name: Factory-VSS-Agents
@@ -24,11 +24,11 @@ stages:
       env:
         ARM_CLIENT_ID: $(terraform-app-client-id)
         ARM_CLIENT_SECRET: $(terraform-app-secret)
-        ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489"  #Must move to KeyVault or inside provider.tf
+        ARM_TENANT_ID: $(tenant)
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
+        azureSubscription: '<subscription>'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
           echo "Start AKSdev Cluster"
-          az aks start --name ecl-az-fact-cls-01-aksdev --resource-group ecl-az-fact-rgp-01-global --subscription azure-euroctl-hub-subs
+          az aks start --name <aksdev> --resource-group <resource_group> --subscription <subscription>

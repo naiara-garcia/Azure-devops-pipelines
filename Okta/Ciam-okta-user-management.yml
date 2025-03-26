@@ -1,4 +1,4 @@
-name: nm-factory-inf-pip-operation-okta-dpro-user-mgmt
+name: Ciam-okta-user-management
 
 trigger: none # will disable CI builds entirely
  
@@ -18,17 +18,12 @@ parameters:
   displayName: Email
   type: string
 
-- name: dproGroup
-  displayName: Okta DPRO Group
+- name: group
+  displayName: Okta Group
   type: string
   values:
-    - Openshift_Factory_1C,3C,4C_developer
-    - Openshift_Factory_1C,3C,4C_PGadmin
-    - Openshift_Factory_1C,3C,4C_operator
-    - Openshift_Factory_2C
-    - ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_developer
-    - ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_PGadmin    
-    - ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_operator
+    - ectl
+    - indra
 
 - name: option
   displayName: Option
@@ -40,7 +35,7 @@ parameters:
 
 variables:
 - name: oktaDomain
-  value: "iam-nm-dev-dpro-admin.okta.com"
+  value: "<ciam_okta>.okta.com"
 
 stages:
 - stage: okta_user_management
@@ -49,12 +44,12 @@ stages:
     condition: ${{ eq(parameters.option, 'create_user') }}
     steps:
     - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      displayName: 'Azure Key Vault secrets'
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        KeyVaultName: 'ecl-az-fact-kvt-01-main'
-        SecretsFilter: 'okta-token'
-        RunAsPreJob: true                
+        azureSubscription: '<subscription>'
+        KeyVaultName: '<keyvault_name>'
+        SecretsFilter: 'okta-ciam-token'
+        RunAsPreJob: true  
 
     - task: Bash@3
       displayName: 'Creation of the user'
@@ -65,7 +60,7 @@ stages:
           curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
           -d '{
             "profile": {
               "firstName": "'"${{parameters.firstName}}"'",
@@ -84,51 +79,41 @@ stages:
           fi
 
       env:
-        OKTA_TOKEN: $(okta-token)
+        OKTA_CIAM_TOKEN: $(okta-ciam-token)
 
   - job: adding_user_to_groups
     condition: not( ${{ eq(parameters.option, 'delete_user') }} )
     dependsOn: create_okta_user
-    steps:
+    steps:  
     - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      displayName: 'Azure Key Vault secrets'
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        KeyVaultName: 'ecl-az-fact-kvt-01-main'
-        SecretsFilter: 'okta-token'
-        RunAsPreJob: true     
+        azureSubscription: '<subscription>'
+        KeyVaultName: '<keyvault_name>'
+        SecretsFilter: 'okta-ciam-token'
+        RunAsPreJob: true  
 
     - task: Bash@3
-      displayName: 'Adding user to groups'
+      displayName: 'Adding user to group(s)'
       inputs:
         targetType: 'inline'
         script: |   
           echo "Create variable with all groups needed"
-          if [[ ${{parameters.dproGroup}} == "Openshift_Factory_1C,3C,4C_developer" ]]; then
-             list_group=("dprodev1c_dplt_developer"               "dprodev3c_dplt_developer"                 "dprodev4c_dplt_developer")
-          elif [[ ${{parameters.dproGroup}} == "Openshift_Factory_1C,3C,4C_PGadmin" ]]; then
-             list_group=("dprodev1c_dplt_administrator"               "dprodev3c_dplt_administrator"                 "dprodev4c_dplt_administrator")
-          elif [[ ${{parameters.dproGroup}} == "Openshift_Factory_1C,3C,4C_operator" ]]; then
-             list_group=("dprodev1c_dplt_operator"               "dprodev3c_dplt_operator"                 "dprodev4c_dplt_operator")
-          elif [[ ${{parameters.dproGroup}} == "Openshift_Factory_2C" ]]; then
-             list_group=("dprodev2c_dplt_administrator"               "dprodev2c_dplt_developer")
-          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_developer" ]]; then
-             list_group=("nmdevtst2c_dplt_developer"               "nmdevtst4c_dplt_developer"                 "nmdevtst8c_dplt_developer"                 "nmdevtst9c_dplt_developer"                 "nmdevtst10c_dplt_developer"                 "nmdevtst11c_dplt_developer"                 "nmdevtst13c_dplt_developer"                 "nmdevtst14c_dplt_developer")                               
-          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_PGadmin" ]]; then
-             list_group=("nmdevtst2c_dplt_administrator"               "nmdevtst4c_dplt_administrator"                 "nmdevtst8c_dplt_administrator"                 "nmdevtst9c_dplt_administrator"                 "nmdevtst10c_dplt_administrator"               "nmdevtst11c_dplt_administrator"               "nmdevtst13c_dplt_administrator"               "nmdevtst14c_dplt_administrator")                               
-          elif [[ ${{parameters.dproGroup}} == "ECTL_Openshift_2C,4C,8C,9C,10C,11C,13C,14C_operator" ]]; then
-             list_group=("nmdevtst2c_dplt_operator"               "nmdevtst4c_dplt_operator"                 "nmdevtst8c_dplt_operator"                 "nmdevtst9c_dplt_operator"                 "nmdevtst10c_dplt_operator"               "nmdevtst11c_dplt_operator"               "nmdevtst13c_dplt_operator"               "nmdevtst14c_dplt_operator")                               
+          if [[ ${{parameters.group}} == "ectl" ]]; then
+             list_group=("ECTL-Users")
+          elif [[ ${{parameters.group}} == "indra" ]]; then
+             list_group=("Indra-users")                               
           else
              echo "Bad dpro group option"
              exit -1
           fi
 
-          echo "Get group ids from all the groups at which the user will be added"
+          echo "Get group ids from the group(s) at which the user will be added"
           for i in ${!list_group[@]}; do
             listid_group[$i]=$(curl -XGET \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
+            -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
             "https://${{variables.oktaDomain}}/api/v1/groups?search=profile.name+eq+%22${list_group[$i]}%22" | jq -r '.[].id')
           done
 
@@ -136,15 +121,15 @@ stages:
           userId=$(curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+eq+%22${{parameters.email}}%22" | jq -r '.[].id')    
 
-          echo "Adding the user to the groups"
+          echo "Adding the user to the group(s)"
           for i in ${!listid_group[@]}; do
             curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X PUT \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
-            -H "Authorization: SSWS ${OKTA_TOKEN}" \
+            -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
             "https://${{variables.oktaDomain}}/api/v1/groups/${listid_group[$i]}/users/$userId" | jq -r '.http_code' > http_code
             if [[ $http_code -ge 400 ]]; then
               echo "User has not been added to ${list_group[$i]} group"
@@ -152,20 +137,21 @@ stages:
             else
               echo "User successfully added to ${list_group[$i]} group"
             fi
-          done
+          done       
+
       env:
-        OKTA_TOKEN: $(okta-token)          
+        OKTA_CIAM_TOKEN: $(okta-ciam-token)
 
   - job: delete_okta_user
     condition: ${{ eq(parameters.option, 'delete_user') }}
     steps:
     - task: AzureKeyVault@2
-      displayName: 'Azure Key Vault: ecl-az-fact-kvt-01-main'
+      displayName: 'Azure Key Vault secrets'
       inputs:
-        azureSubscription: 'ecl-az-fact-svc-01-armconnection'
-        KeyVaultName: 'ecl-az-fact-kvt-01-main'
-        SecretsFilter: 'okta-token'
-        RunAsPreJob: true     
+        azureSubscription: '<subscription>'
+        KeyVaultName: '<keyvault_name>'
+        SecretsFilter: 'okta-ciam-token'
+        RunAsPreJob: true  
 
     - task: Bash@3
       displayName: 'Deleting user'
@@ -176,7 +162,7 @@ stages:
           userId=$(curl -X GET \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users?search=profile.email+sw+%22${{parameters.email}}%22" | jq -r '.[].id')
           if [[ -z userId ]]; then
             echo "User does not exist"
@@ -189,7 +175,7 @@ stages:
           curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X POST \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users/$userId/lifecycle/deactivate?sendEmail=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
 
           http_code=$(jq .http_code resp.json | tr -d '"') 
@@ -204,7 +190,7 @@ stages:
           curl --no-progress-meter -w '{"http_code": "%{http_code}"}' -X DELETE \
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -H "Authorization: SSWS ${OKTA_TOKEN}" \
+          -H "Authorization: SSWS ${OKTA_CIAM_TOKEN}" \
           "https://${{variables.oktaDomain}}/api/v1/users/$userId?sendEmail=false" | jq -s '.[-1] * .[-2]' | jq "{ http_code: .http_code, id: .id, status: .status, profile: .profile, errorSummary: .errorSummary, errorCauses: .errorCauses }" > resp.json
           http_code=$(jq .http_code resp.json | tr -d '"') 
           if [[ $http_code -ge 400 ]]; then
@@ -213,5 +199,6 @@ stages:
           else
             echo "User deleted successfully"
           fi
+
       env:
-        OKTA_TOKEN: $(okta-token)
+        OKTA_CIAM_TOKEN: $(okta-ciam-token)

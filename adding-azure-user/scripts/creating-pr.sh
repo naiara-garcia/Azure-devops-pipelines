@@ -7,8 +7,8 @@ REVIEWERS=$4
 
 BRANCHTARGET="feature/$BRANCH"
 BRANCHSOURCE="refs/heads/main"
-PROJECT="ecl-ado-prj-iac"
-ORGURL="https://dev.azure.com/ecl-ado-factory"
+PROJECT="<project>"
+ORGURL="https://dev.azure.com/<organization>"
 URIBRANCHSTATUS="$ORGURL/$PROJECT/_apis/git/repositories/$REPO/stats/branches?name=$BRANCHTARGET"
 URICHECKACTIVEPR="$ORGURL/$PROJECT/_apis/git/repositories/$REPO/pullrequests?searchCriteria.targetRefName=$BRANCHTARGET&searchCriteria.sourceRefName=$BRANCHSOURCE"
 
@@ -34,7 +34,7 @@ else
     echo "PR exists already at $REPO repository"
     exit 1
   else
-    az repos pr create -r $REPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --auto-complete true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket $BRANCH" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "$BRANCH" "" "Close or affect [this](https://jira.eurocontrol.int/browse/$BRANCH) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [X] The PR has a descriptive title" "- [X] The changes section has been checked" "- [X] A person has been assigned to this PR" "- [X] Clear comments from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket $BRANCH"   
+    az repos pr create -r $REPO -s $BRANCHTARGET -p $PROJECT --org $ORGURL --delete-source-branch true --auto-complete true --description "## What does this PR do?" "This PR is to add/remove users indicated at ticket $BRANCH" "" "## Why is it necessary?" "Because the users need this access to perform his daily job." "" "## Pull request type" "- [ ] Bugfix" "- [ ] New feature" "- [X] IaC change" "- [ ] Add new alert" "- [ ] Alert modification" "" "## Related ticket" "$BRANCH" "" "Close or affect [this](https://<jira_url>/browse/$BRANCH) ticket." "" "## CI Output" "" "N/A" "" "## Checks" "" "- [X] The PR has a descriptive title" "- [X] The changes section has been checked" "- [X] A person has been assigned to this PR" "- [X] Clear comments from sections" --reviewer $REVIEWERS --title "Performed the actions requested at ticket $BRANCH"   
   fi
 fi      
 

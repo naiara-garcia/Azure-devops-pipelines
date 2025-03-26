@@ -1,4 +1,4 @@
-name: nm-factory-inf-mod-keycloak-user-mgmt
+name: Keycloak-user-management
 
 trigger: none
 pr: none
@@ -9,10 +9,10 @@ pool:
 variables:
   - group: factory-keycloak-user-mgmt
   - name: keycloak_hostname
-    value: keycloak-factory.dplt.dev
+    value: <keycloak_hostname>
     readonly: true
   - name: user_realm
-    value: factory
+    value: <realm>
     readonly: true
 
 parameters:
@@ -31,10 +31,7 @@ parameters:
     type: string
     values:
       - dpro_developer
-      - dplt_pipeline
       - dplt_developer
-      - infra_admin
-      - dpro_dplt_developer
 
 stages:
   - stage: Manage_Keycloak_Users
@@ -43,11 +40,11 @@ stages:
 
         steps:
           - task: AzureKeyVault@2
-            displayName: "Azure Key Vault: ecl-az-seed-kvt-01-tfkv"
+            displayName: "Azure Key Vault secrets"
             inputs:
-              azureSubscription: "ecl-az-fact-svc-01-armconnection"
-              KeyVaultName: "ecl-az-seed-kvt-01-tfkv"
-              SecretsFilter: "terraform-app-client-id, terraform-app-secret"
+              azureSubscription: "<subscription>"
+              KeyVaultName: "<keyvault_name>"
+              SecretsFilter: "<secrets>"
               RunAsPreJob: true
 
           - task: AzureCLI@2
@@ -56,9 +53,9 @@ stages:
             env:
               ARM_CLIENT_ID: $(terraform-app-client-id)
               ARM_CLIENT_SECRET: $(terraform-app-secret)
-              ARM_TENANT_ID: "9e296acd-1e44-44f0-8c77-cc9dbce85489" #Must move to KeyVault or inside provider.tf
+              ARM_TENANT_ID: $(tenant)
             inputs:
-              azureSubscription: "ecl-az-fact-svc-01-armconnection"
+              azureSubscription: "<subscription>"
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |

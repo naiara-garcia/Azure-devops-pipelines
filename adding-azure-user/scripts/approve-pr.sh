@@ -5,8 +5,8 @@ REPO=$2
 BRANCH=$3
 
 BRANCHTARGET="feature/$BRANCH"
-PROJECT="ecl-ado-prj-iac"
-ORGURL="https://dev.azure.com/ecl-ado-factory"
+PROJECT="<project>"
+ORGURL="https://dev.azure.com/<organization>"
 
 echo "Login to az devops to allow PR approvation and merged"
 echo $TOKEN | az devops login --organization $ORGURL

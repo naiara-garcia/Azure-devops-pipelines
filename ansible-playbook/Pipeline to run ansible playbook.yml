@@ -1,0 +1,54 @@
+# Pipeline to launch Ansible playbooks
+name: Run ansible playbook to configure VM
+
+variables:
+- group: ansible
+
+pool:
+  name: Factory-VSS-Agents
+
+parameters:
+- name: playbook
+  displayName: Playbook
+  type: string
+  values:
+  - test.yml
+  - configure-dns.yml
+
+steps:
+- task: CmdLine@2
+  displayName: "Create ansible server"
+  inputs:
+    script: |
+      echo "Create credentials file"
+      echo $(credentials) | base64 -d > ~/.azure/credentials
+
+      echo "Create private key for nattest"
+      echo $(nattest) | base64 -d > ~/nattest.pem
+      chmod 600 ~/nattest.pem
+
+      echo "Install python 3"
+      sudo apt install -y python3-pip
+
+      echo "Install ansible"
+      sudo apt install -y ansible
+      pip3 install 'ansible[azure]'
+
+      echo "install azure_rm collection"
+      ansible-galaxy collection install azure.azcollection
+      pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+      ansible-galaxy collection install azure.azcollection --force
+
+- task: CopyFiles@2
+  displayName: "Copy files"
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/nattest'
+    Contents: '**'
+    TargetFolder: '/tmp'
+    OverWrite: true
+
+- task: CmdLine@2
+  displayName: "Launch playbook"
+  inputs:
+    script: |
+      ansible-playbook -i /tmp/inventories/myazure_rm.yml /tmp/${{ parameters.playbook }}

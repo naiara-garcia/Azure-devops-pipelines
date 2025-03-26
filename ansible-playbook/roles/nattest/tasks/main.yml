@@ -1,0 +1,22 @@
+---
+# tasks file for nattest
+
+- name: Install DNS packages
+  ansible.builtin.apt:
+    pkg:
+    - bind9
+
+- name: Enable service named
+  ansible.builtin.systemd:
+    name: named
+    enabled: true
+
+- name: Copy configuration files
+  ansible.builtin.copy:
+    src: "files/{{ item }}"
+    dest: /etc/bind/{{ item }}
+    owner: root
+    group: bind
+    mode: '0644'
+  loop: "{{ files | list }}"
+  notify: "Reload named"  

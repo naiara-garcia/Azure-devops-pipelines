@@ -1,0 +1,8 @@
+---
+# handlers file for nattest
+
+- name: Reload service named
+  ansible.builtin.systemd:
+    name: named
+    state: reloaded  
+  listen: "Reload named"

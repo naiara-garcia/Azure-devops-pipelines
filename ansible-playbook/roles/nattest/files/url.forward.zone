@@ -1,0 +1,14 @@
+$TTL 1D
+@             IN      SOA   <url>. root.<url>. (
+                        2003080800 ; se = serial number
+                        60         ; ref = refresh
+                        60         ; ret = update retry
+                        60         ; ex = expiry
+                        60         ; min = minimum
+                        )
+
+              IN      NS      <url>.
+service1      IN      A       192.168.100.5
+service2      IN      A       192.168.100.4
+service3      IN      A       192.168.100.3
+service4      IN      A       192.168.100.2

@@ -1,0 +1,6 @@
+plugin: azure.azcollection.azure_rm
+include_vm_resource_groups:
+  - <resource_group>
+auth_source: credential_file
+conditional_groups:
+  nattest: "'nattest' in name"

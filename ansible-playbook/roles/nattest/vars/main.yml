@@ -1,0 +1,6 @@
+---
+# vars file for nattest
+
+files:
+  - "named.conf.local"
+  - "url.forward.zone"

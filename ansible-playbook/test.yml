@@ -1,0 +1,6 @@
+- name: Testing nattest connection
+  hosts: nattest 
+
+  tasks:
+  - name: Test connection
+    ansible.builtin.ping:

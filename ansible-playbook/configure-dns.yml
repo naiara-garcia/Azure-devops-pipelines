@@ -1,0 +1,10 @@
+---
+###############################################################
+## PLAYBOOK to configure nattest
+###############################################################
+- name: Configure nattest
+  hosts: all 
+  become: yes
+  gather_facts: no
+  roles:
+    - nattest   
